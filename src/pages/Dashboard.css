@@ -71,7 +71,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 .kpi-card:hover {
   border-color: var(--border-strong);

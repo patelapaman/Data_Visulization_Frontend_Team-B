@@ -11,11 +11,19 @@ import {
   ListTree,
   SlidersHorizontal,
 } from "lucide-react";
-import DashboardLayout from "../components/layout/DashboardLayout";
+import DashboardLayout from "../components/layouts/DashboardLayout";
 import "./Dashboard.css";
 
 
 export default function Dashboard() {
+  const kpiItems = [
+    { icon: Activity, label: "Total Events", value: "18,204", tone: "cyan" },
+    { icon: ShieldAlert, label: "Critical Threats", value: "27", tone: "critical" },
+    { icon: TriangleAlert, label: "High Severity Alerts", value: "93", tone: "high" },
+    { icon: Bug, label: "Vulnerabilities", value: "341", tone: "medium" },
+    { icon: Siren, label: "Active Incidents", value: "6", tone: "critical" },
+  ];
+
   return (
     <DashboardLayout pageTitle="Overview">
       {/* ---- Filters row  */}
@@ -27,36 +35,15 @@ export default function Dashboard() {
 
       {/* ---- KPI cards : plug in here */}
       <section className="kpi-grid" aria-label="Key metrics">
-        <KpiPlaceholder
-          icon={Activity}
-          label="Total Events"
-          value="18,204"
-          tone="cyan"
-        />
-        <KpiPlaceholder
-          icon={ShieldAlert}
-          label="Critical Threats"
-          value="27"
-          tone="critical"
-        />
-        <KpiPlaceholder
-          icon={TriangleAlert}
-          label="High Severity Alerts"
-          value="93"
-          tone="high"
-        />
-        <KpiPlaceholder
-          icon={Bug}
-          label="Vulnerabilities"
-          value="341"
-          tone="medium"
-        />
-        <KpiPlaceholder
-          icon={Siren}
-          label="Active Incidents"
-          value="6"
-          tone="critical"
-        />
+        {kpiItems.map((item) => (
+          <KpiPlaceholder
+            key={item.label}
+            icon={item.icon}
+            label={item.label}
+            value={item.value}
+            tone={item.tone}
+          />
+        ))}
       </section>
 
       {/* ---- Charts :  plug in here ---- */}
