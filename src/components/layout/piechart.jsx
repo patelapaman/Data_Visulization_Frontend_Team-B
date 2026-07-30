@@ -20,7 +20,7 @@ const COLORS = ["#FF4D4F", "#FAAD14", "#1890FF", "#52C41A"];
 function PieChartComponent() {
   return (
     <div style={{ width: "100%", height: 350 }}>
-      <h2>Threat Distribution</h2>
+      <h2>Pie Chart (Threat Distribution)</h2>
 
       <ResponsiveContainer>
         <PieChart>
