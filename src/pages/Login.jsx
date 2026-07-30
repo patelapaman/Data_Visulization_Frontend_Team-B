@@ -131,7 +131,7 @@ export default function Login() {
 
         <p className="login-footnote">
           Demo build — any email + a password of 4+ characters signs you in.
-          Member 7 will connect this to the real authentication API.
+          
         </p>
       </div>
     </div>
