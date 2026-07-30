@@ -1,16 +1,23 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const data = [
-  { name: "Critical", value: 50 },
-  { name: "High", value: 80 },
-  { name: "Medium", value: 150 },
-  { name: "Low", value: 100 },
+  { name: "Critical", value: 346 },
+  { name: "High", value: 573 },
+  { name: "Medium", value: 437 },
+  { name: "Low", value: 444 },
 ];
 
-const COLORS = ["#FF4C4C", "#FF9F43", "#FFD93D", "#4CAF50"];
+const COLORS = ["#FF4D4F", "#FAAD14", "#1890FF", "#52C41A"];
 
-const PieChartComponent = () => {
+function PieChartComponent() {
   return (
     <div style={{ width: "100%", height: 350 }}>
       <h2>Threat Distribution</h2>
@@ -19,14 +26,15 @@ const PieChartComponent = () => {
         <PieChart>
           <Pie
             data={data}
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
             dataKey="value"
+            outerRadius={110}
             label
           >
             {data.map((entry, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              <Cell
+                key={index}
+                fill={COLORS[index % COLORS.length]}
+              />
             ))}
           </Pie>
 
@@ -36,6 +44,6 @@ const PieChartComponent = () => {
       </ResponsiveContainer>
     </div>
   );
-};
+}
 
 export default PieChartComponent;
