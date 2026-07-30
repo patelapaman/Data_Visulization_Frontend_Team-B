@@ -14,18 +14,31 @@ import {
 import DashboardLayout from "../components/layout/DashboardLayout";
 import "./Dashboard.css";
 
-
+/**
+ * Dashboard (page)
+ *
+ * This is a WORKING DEMO of the dashboard layout so the shell can be
+ * previewed/tested on its own. Everything inside the sections marked
+ * "PLACEHOLDER" belongs to another teammate's task and should be
+ * swapped for their real component — the layout/grid around it can
+ * stay as-is since that's this task's job (Member 2).
+ *
+ *   Member 3 -> <KpiCards />         (replaces .kpi-grid contents)
+ *   Member 4 -> <SecurityEventsTable /> (replaces .table-placeholder)
+ *   Member 5 -> <ThreatPieChart />, <EventTrendLine />, <TopAttacksBar />
+ *   Member 6 -> <FiltersBar />       (replaces .filters-placeholder)
+ */
 export default function Dashboard() {
   return (
     <DashboardLayout pageTitle="Overview">
-      {/* ---- Filters row  */}
+      {/* ---- Filters row : Member 6 plugs in here ---- */}
       <section className="filters-placeholder" aria-label="Filters">
         <SlidersHorizontal size={16} />
         <span>Filters — Severity · Date range · Event type · IP address</span>
-        <span className="placeholder-tag"></span>
+        <span className="placeholder-tag">Member 6</span>
       </section>
 
-      {/* ---- KPI cards : plug in here */}
+      {/* ---- KPI cards : Member 3 plugs in here, wired to GET /stats ---- */}
       <section className="kpi-grid" aria-label="Key metrics">
         <KpiPlaceholder
           icon={Activity}
@@ -59,7 +72,7 @@ export default function Dashboard() {
         />
       </section>
 
-      {/* ---- Charts :  plug in here ---- */}
+      {/* ---- Charts : Member 5 plugs in here ---- */}
       <section className="charts-grid" aria-label="Analytics">
         <ChartPlaceholder
           icon={PieChart}
@@ -78,12 +91,12 @@ export default function Dashboard() {
         />
       </section>
 
-      {/* ---- Table : plug in here ---- */}
+      {/* ---- Table : Member 4 plugs in here ---- */}
       <section className="table-placeholder" aria-label="Security events table">
         <div className="panel-header">
           <ListTree size={17} />
           <h2>Security Events</h2>
-          <span className="placeholder-tag"></span>
+          <span className="placeholder-tag">Member 4</span>
         </div>
         <p className="panel-note">
           Time · Event Type · Severity · Source IP · Status — with search,
