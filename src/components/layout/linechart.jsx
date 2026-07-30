@@ -39,7 +39,7 @@ const data = [
 function LineChartComponent() {
   return (
     <div style={{ width: "100%", height: 350 }}>
-      <h2>Event Trend</h2>
+      <h2>Line Chart (Event Trend)</h2>
 
       <ResponsiveContainer>
         <LineChart data={data}>
