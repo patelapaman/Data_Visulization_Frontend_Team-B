@@ -57,15 +57,6 @@ git commit -m "chore: project setup, routing, login page, dashboard layout"
 git remote add origin <your-repo-url>
 git push -u origin main
 ```
-If the team already has a shared repo, copy these files into it (respecting
-the existing folder layout above) instead of pushing this as a new repo, then:
-```bash
-git checkout -b feature/setup-routing-login
-git add .
-git commit -m "feat: project setup, folder structure, login page, routing"
-git push origin feature/setup-routing-login
-```
-Open a PR for Member 8 to merge.
 
 ## Handoff notes for the rest of the team
 `Dashboard.jsx` contains clearly labeled placeholder sections — swap these
