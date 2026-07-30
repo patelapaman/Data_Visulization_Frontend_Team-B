@@ -1,8 +1,5 @@
 # SentryNet — AI-Assisted Threat Detection Dashboard (Frontend)
 
-A runnable React + Vite app implementing:
-- **Member 1** — Project setup, folder structure, Login page, routing
-- **Member 2** — Sidebar, Navbar, responsive Dashboard layout
 
 ## Folder structure
 ```
