@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentinel | Threat Detection Dashboard — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0F14;
+    --panel: #121821;
+    --panel-raised: #161E29;
+    --border: #1E2733;
+    --border-soft: #182029;
+    --text: #E7ECF2;
+    --text-muted: #8592A3;
+    --text-faint: #4C5866;
+    --teal: #4FD1C5;
+    --teal-dim: rgba(79, 209, 197, 0.12);
+    --amber: #E8A33D;
+    --amber-dim: rgba(232, 163, 61, 0.12);
+    --red: #F2555A;
+    --red-dim: rgba(242, 85, 90, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background-image:
+      linear-gradient(rgba(79,209,197,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,209,197,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    height: 100vh;
+    min-height: 640px;
+  }
+
+  /* ===== LEFT: LIVE EVENT STREAM ===== */
+  .stream-panel {
+    position: relative;
+    background: linear-gradient(180deg, #0D1218 0%, #0A0E13 100%);
+    border-right: 1px solid var(--border);
+    padding: 40px 44px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 46px;
+    flex-shrink: 0;
+  }
+
+  .brand-mark {
+    width: 34px; height: 34px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .brand-mark svg { width: 100%; height: 100%; }
+
+  .brand-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: 0.01em;
+  }
+  .brand-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+    margin-top: 1px;
+  }
+
+  .stream-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.3;
+    max-width: 420px;
+    margin: 0 0 12px 0;
+  }
+  .stream-heading span { color: var(--teal); }
+
+  .stream-desc {
+    color: var(--text-muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 0 36px 0;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 28px;
+    flex-shrink: 0;
+  }
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .stat-val.teal { color: var(--teal); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .feed-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.012);
+    overflow: hidden;
+  }
+  .feed-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+  }
+  .live-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--teal);
+  }
+  .live-dot::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 0 0 rgba(79,209,197,0.6);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(79,209,197,0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(79,209,197,0); }
+    100% { box-shadow: 0 0 0 0 rgba(79,209,197,0); }
+  }
+
+  .feed-body {
+    padding: 4px 0;
+    height: calc(100% - 37px);
+    overflow: hidden;
+    position: relative;
+  }
+  .feed-body::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, transparent, rgba(10,14,19,0.9));
+    pointer-events: none;
+  }
+
+  .feed-track {
+    display: flex;
+    flex-direction: column;
+    animation: scrollUp 22s linear infinite;
+  }
+
+  .log-line {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+  }
+  .log-ts { color: var(--text-faint); flex-shrink: 0; }
+  .log-tag {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1.5px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+  .tag-low { color: var(--teal); background: var(--teal-dim); }
+  .tag-med { color: var(--amber); background: var(--amber-dim); }
+  .tag-high { color: var(--red); background: var(--red-dim); }
+  .log-msg { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; }
+  .log-msg b { color: var(--text); font-weight: 500; }
+
+  @keyframes scrollUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+
+  .stream-footer {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-faint);
+    flex-shrink: 0;
+  }
+  .stream-footer .fw-icon { flex-shrink: 0; opacity: 0.7; }
+
+  /* ===== RIGHT: AUTH PANEL ===== */
+  .auth-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: var(--bg);
+  }
+
+  .auth-box {
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .auth-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .auth-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+  .auth-subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0 0 32px 0;
+    line-height: 1.5;
+  }
+
+  .field-group { margin-bottom: 18px; }
+  .field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 7px;
+  }
+  .field-input-wrap { position: relative; }
+  .field-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--panel-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field-input::placeholder { color: var(--text-faint); }
+  .field-input:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.14);
+  }
+  .field-input:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+  }
+
+  .field-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+  .field-toggle:hover { color: var(--text-muted); }
+  .field-toggle:focus-visible { outline: 2px solid var(--teal); border-radius: 4px; }
+
+  .row-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 4px 0 24px 0;
+  }
+
+  .remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+  }
+  .remember input {
+    appearance: none;
+    width: 15px; height: 15px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel-raised);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .remember input:checked {
+    background: var(--teal);
+    border-color: var(--teal);
+  }
+  .remember input:checked::after {
+    content: '';
+    position: absolute;
+    left: 4.5px; top: 1.5px;
+    width: 4px; height: 8px;
+    border: solid var(--bg);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .remember input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  .link {
+    color: var(--teal);
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .link:hover { text-decoration: underline; }
+  .link:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 3px; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--teal);
+    color: #05201D;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary:hover { background: #6BDCD1; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: var(--text-faint);
+    font-size: 12px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .sso-row { display: flex; gap: 10px; }
+  .btn-sso {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: var(--panel-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .btn-sso:hover { border-color: var(--text-faint); background: #1A2330; }
+  .btn-sso:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  .signup-line {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .mfa-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 11px 13px;
+    background: var(--panel-raised);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-faint);
+    line-height: 1.5;
+  }
+  .mfa-note svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .feed-track { animation: none; }
+    .live-dot::before { animation: none; }
+  }
+
+  /* Responsive */
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    .stream-panel { display: none; }
+    .auth-panel { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- LEFT: LIVE EVENT STREAM -->
+  <div class="stream-panel">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 34 34" fill="none">
+          <path d="M17 2L30 8V16C30 24.5 24.5 30.5 17 32C9.5 30.5 4 24.5 4 16V8L17 2Z" stroke="#4FD1C5" stroke-width="1.6"/>
+          <path d="M17 8L23 11V16.5C23 21 20.5 24 17 25.2C13.5 24 11 21 11 16.5V11L17 8Z" fill="#4FD1C5" fill-opacity="0.14" stroke="#4FD1C5" stroke-width="1.2"/>
+          <circle cx="17" cy="17" r="1.8" fill="#4FD1C5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Sentinel</div>
+        <div class="brand-sub">THREAT DETECTION PLATFORM</div>
+      </div>
+    </div>
+
+    <h1 class="stream-heading">Every event, scored and<br><span>prioritized</span> the moment it happens.</h1>
+    <p class="stream-desc">AI-assisted risk scoring across your logs, threat feeds, and vulnerability data — mapped to MITRE ATT&amp;CK, ranked by what actually needs attention.</p>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-val teal">1,284</div>
+        <div class="stat-label">Events / min</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val amber">37</div>
+        <div class="stat-label">Open incidents</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">99.2%</div>
+        <div class="stat-label">Uptime</div>
+      </div>
+    </div>
+
+    <div class="feed-wrap">
+      <div class="feed-header">
+        <span>event_stream.log</span>
+        <span class="live-dot">LIVE</span>
+      </div>
+      <div class="feed-body">
+        <div class="feed-track">
+          <div class="log-line"><span class="log-ts">14:22:41</span><span class="log-tag tag-low">INFO</span><span class="log-msg">User <b>a.reyes</b> authenticated from 10.4.2.18</span></div>
+          <div class="log-line"><span class="log-ts">14:22:34</span><span class="log-tag tag-med">MED</span><span class="log-msg">Repeated failed login for <b>svc-backup</b> (4x)</span></div>
+          <div class="log-line"><span class="log-ts">14:22:27</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Vulnerability feed synced — <b>212</b> CVEs ingested</span></div>
+          <div class="log-line"><span class="log-ts">14:22:20</span><span class="log-tag tag-high">HIGH</span><span class="log-msg">Anomalous outbound traffic from <b>host-2291</b></span></div>
+          <div class="log-line"><span class="log-ts">14:22:13</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Asset inventory refreshed — <b>1,842</b> endpoints</span></div>
+          <div class="log-line"><span class="log-ts">14:22:06</span><span class="log-tag tag-med">MED</span><span class="log-msg">Unusual login time detected for <b>j.kwan</b></span></div>
+          <div class="log-line"><span class="log-ts">14:21:59</span><span class="log-tag tag-high">HIGH</span><span class="log-msg">Signature match: <b>T1059</b> — command execution</span></div>
+          <div class="log-line"><span class="log-ts">14:21:52</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Threat intel feed updated from 3 sources</span></div>
+          <div class="log-line"><span class="log-ts">14:21:45</span><span class="log-tag tag-med">MED</span><span class="log-msg">Port scan detected from external IP range</span></div>
+          <div class="log-line"><span class="log-ts">14:21:38</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Daily risk score recalculated for 14 assets</span></div>
+          <div class="log-line"><span class="log-ts">14:21:31</span><span class="log-tag tag-high">HIGH</span><span class="log-msg">Privilege escalation attempt on <b>db-prod-03</b></span></div>
+          <div class="log-line"><span class="log-ts">14:21:24</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Backup integrity check passed</span></div>
+
+          <div class="log-line"><span class="log-ts">14:22:41</span><span class="log-tag tag-low">INFO</span><span class="log-msg">User <b>a.reyes</b> authenticated from 10.4.2.18</span></div>
+          <div class="log-line"><span class="log-ts">14:22:34</span><span class="log-tag tag-med">MED</span><span class="log-msg">Repeated failed login for <b>svc-backup</b> (4x)</span></div>
+          <div class="log-line"><span class="log-ts">14:22:27</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Vulnerability feed synced — <b>212</b> CVEs ingested</span></div>
+          <div class="log-line"><span class="log-ts">14:22:20</span><span class="log-tag tag-high">HIGH</span><span class="log-msg">Anomalous outbound traffic from <b>host-2291</b></span></div>
+          <div class="log-line"><span class="log-ts">14:22:13</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Asset inventory refreshed — <b>1,842</b> endpoints</span></div>
+          <div class="log-line"><span class="log-ts">14:22:06</span><span class="log-tag tag-med">MED</span><span class="log-msg">Unusual login time detected for <b>j.kwan</b></span></div>
+          <div class="log-line"><span class="log-ts">14:21:59</span><span class="log-tag tag-high">HIGH</span><span class="log-msg">Signature match: <b>T1059</b> — command execution</span></div>
+          <div class="log-line"><span class="log-ts">14:21:52</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Threat intel feed updated from 3 sources</span></div>
+          <div class="log-line"><span class="log-ts">14:21:45</span><span class="log-tag tag-med">MED</span><span class="log-msg">Port scan detected from external IP range</span></div>
+          <div class="log-line"><span class="log-ts">14:21:38</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Daily risk score recalculated for 14 assets</span></div>
+          <div class="log-line"><span class="log-ts">14:21:31</span><span class="log-tag tag-high">HIGH</span><span class="log-msg">Privilege escalation attempt on <b>db-prod-03</b></span></div>
+          <div class="log-line"><span class="log-ts">14:21:24</span><span class="log-tag tag-low">INFO</span><span class="log-msg">Backup integrity check passed</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stream-footer">
+      <svg class="fw-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="12" height="8" rx="1.5" stroke="#4C5866" stroke-width="1.2"/><path d="M4 5V3.5C4 2.12 5.12 1 6.5 1H7.5C8.88 1 10 2.12 10 3.5V5" stroke="#4C5866" stroke-width="1.2"/></svg>
+      Your session is encrypted end-to-end and monitored for anomalous access.
+    </div>
+  </div>
+
+  <!-- RIGHT: AUTH PANEL -->
+  <div class="auth-panel">
+    <div class="auth-box">
+      <div class="auth-eyebrow">Analyst Access</div>
+      <h2 class="auth-title">Sign in to Sentinel</h2>
+      <p class="auth-subtitle">Enter your credentials to reach your threat monitoring workspace.</p>
+
+      <form id="loginForm" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="email">Work email</label>
+          <div class="field-input-wrap">
+            <input class="field-input" type="email" id="email" placeholder="you@organization.com" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="password">Password</label>
+          <div class="field-input-wrap">
+            <input class="field-input" type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+          </div>
+        </div>
+
+        <div class="row-between">
+          <label class="remember">
+            <input type="checkbox" id="remember">
+            Keep me signed in
+          </label>
+          <a href="#" class="link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-primary">Sign in</button>
+      </form>
+
+      <div class="divider">or continue with</div>
+
+      <div class="sso-row">
+        <button type="button" class="btn-sso">
+          <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.8-.07-1.5-.2-2.2H12v4.2h5.9c-.25 1.4-1.05 2.6-2.2 3.4v2.8h3.6c2.1-1.95 3.2-4.8 3.2-8.2z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-1 7.28-2.7l-3.6-2.8c-1 .67-2.27 1.07-3.68 1.07-2.83 0-5.22-1.9-6.08-4.47H2.2v2.87C4 20.9 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.92 14.1c-.22-.67-.35-1.38-.35-2.1s.13-1.43.35-2.1V7.03H2.2A10.97 10.97 0 0 0 1 12c0 1.77.42 3.45 1.2 4.97l3.72-2.87z"/><path fill="#EA4335" d="M12 4.75c1.6 0 3.05.55 4.18 1.63l3.15-3.15C17.45 1.4 14.97.4 12 .4 7.7.4 4 2.5 2.2 5.63l3.72 2.87C6.78 6.65 9.17 4.75 12 4.75z"/></svg>
+          Google
+        </button>
+        <button type="button" class="btn-sso">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M17.5 2H6.5C4 2 2 4 2 6.5v11C2 20 4 22 6.5 22h11c2.5 0 4.5-2 4.5-4.5v-11C22 4 20 2 17.5 2z" stroke="#8592A3" stroke-width="1.3"/><path d="M8 12l2.8 2.8L16 9" stroke="#8592A3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          SSO / SAML
+        </button>
+      </div>
+
+      <div class="mfa-note">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="12" height="8" rx="1.5" stroke="#8592A3" stroke-width="1.2"/><path d="M4 5V3.5C4 2.12 5.12 1 6.5 1H7.5C8.88 1 10 2.12 10 3.5V5" stroke="#8592A3" stroke-width="1.2"/></svg>
+        <span>Multi-factor authentication will be requested after sign-in for accounts with elevated dashboard access.</span>
+      </div>
+
+      <p class="signup-line">Need access? <a href="#" class="link">Request an analyst account</a></p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
