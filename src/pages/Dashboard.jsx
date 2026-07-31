@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Activity,
   ShieldAlert,
@@ -12,6 +12,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import { getStats } from "../services/api";
 import "./Dashboard.css";
 import SecurityEventsTable from "../components/SecurityEventsTable";
 
@@ -30,6 +31,81 @@ import SecurityEventsTable from "../components/SecurityEventsTable";
  *   Member 6 -> <FiltersBar />       (replaces .filters-placeholder)
  */
 export default function Dashboard() {
+  const [stats, setStats] = useState({
+    totalEvents: null,
+    criticalThreats: null,
+    highSeverityAlerts: null,
+    vulnerabilities: null,
+    activeIncidents: null,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadStats() {
+      try {
+        const result = await getStats();
+        if (!isMounted) return;
+
+        setStats({
+          totalEvents: result.totalEvents ?? result.total_events ?? 0,
+          criticalThreats:
+            result.criticalThreats ?? result.critical_threats ?? 0,
+          highSeverityAlerts:
+            result.highSeverityAlerts ?? result.high_severity_alerts ?? 0,
+          vulnerabilities: result.vulnerabilities ?? 0,
+          activeIncidents:
+            result.activeIncidents ?? result.active_incidents ?? 0,
+        });
+      } catch (error) {
+        if (!isMounted) return;
+        setStatsError(error?.message ?? "Unable to load stats");
+      } finally {
+        if (isMounted) setStatsLoading(false);
+      }
+    }
+
+    loadStats();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const kpiItems = [
+    {
+      icon: Activity,
+      label: "Total Events",
+      value: stats.totalEvents,
+      tone: "cyan",
+    },
+    {
+      icon: ShieldAlert,
+      label: "Critical Threats",
+      value: stats.criticalThreats,
+      tone: "critical",
+    },
+    {
+      icon: TriangleAlert,
+      label: "High Severity Alerts",
+      value: stats.highSeverityAlerts,
+      tone: "high",
+    },
+    {
+      icon: Bug,
+      label: "Vulnerabilities",
+      value: stats.vulnerabilities,
+      tone: "medium",
+    },
+    {
+      icon: Siren,
+      label: "Active Incidents",
+      value: stats.activeIncidents,
+      tone: "critical",
+    },
+  ];
+
   return (
     <DashboardLayout pageTitle="Overview">
       {/* ---- Filters row : Member 6 plugs in here ---- */}
@@ -41,37 +117,20 @@ export default function Dashboard() {
 
       {/* ---- KPI cards : Member 3 plugs in here, wired to GET /stats ---- */}
       <section className="kpi-grid" aria-label="Key metrics">
-        <KpiPlaceholder
-          icon={Activity}
-          label="Total Events"
-          value="18,204"
-          tone="cyan"
-        />
-        <KpiPlaceholder
-          icon={ShieldAlert}
-          label="Critical Threats"
-          value="27"
-          tone="critical"
-        />
-        <KpiPlaceholder
-          icon={TriangleAlert}
-          label="High Severity Alerts"
-          value="93"
-          tone="high"
-        />
-        <KpiPlaceholder
-          icon={Bug}
-          label="Vulnerabilities"
-          value="341"
-          tone="medium"
-        />
-        <KpiPlaceholder
-          icon={Siren}
-          label="Active Incidents"
-          value="6"
-          tone="critical"
-        />
+        {kpiItems.map((item) => (
+          <KpiPlaceholder
+            key={item.label}
+            icon={item.icon}
+            label={item.label}
+            value={formatMetric(item.value, statsLoading)}
+            tone={item.tone}
+          />
+        ))}
       </section>
+
+      {statsError ? (
+        <div className="stats-error">Unable to load KPI metrics.</div>
+      ) : null}
 
       {/* ---- Charts : Member 5 plugs in here ---- */}
       <section className="charts-grid" aria-label="Analytics">
@@ -96,6 +155,18 @@ export default function Dashboard() {
       <SecurityEventsTable />
     </DashboardLayout>
   );
+}
+
+function formatMetric(value, loading) {
+  if (loading) {
+    return "…";
+  }
+
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return typeof value === "number" ? value.toLocaleString() : value;
 }
 
 function KpiPlaceholder({ icon: Icon, label, value, tone }) {

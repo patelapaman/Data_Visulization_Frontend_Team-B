@@ -87,3 +87,13 @@ export async function getEvents() {
 
   return response.json();
 }
+
+export async function getStats() {
+  const response = await fetch(`${BASE_URL}/stats`);
+
+  if (!response.ok) {
+    throw new Error("Unable to fetch stats");
+  }
+
+  return response.json();
+}
