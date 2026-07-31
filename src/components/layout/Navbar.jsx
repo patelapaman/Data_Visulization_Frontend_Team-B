@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";                      // ⬅ CHANGED (new import)
 import { Menu, Search, Bell, ChevronDown } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";                  // ⬅ CHANGED (new import)
 import "./Navbar.css";
 
 /**
@@ -15,6 +17,14 @@ import "./Navbar.css";
 export default function Navbar({ onToggleMobile, pageTitle = "Overview" }) {
   const [query, setQuery] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
+  const { user, logout } = useAuth();                                // ⬅ CHANGED (new)
+  const navigate = useNavigate();                                    // ⬅ CHANGED (new)
+
+  function handleLogout() {                                          // ⬅ CHANGED (new function)
+    logout();
+    setProfileOpen(false);
+    navigate("/login", { replace: true });
+  }
 
   return (
     <header className="navbar">
@@ -68,8 +78,10 @@ export default function Navbar({ onToggleMobile, pageTitle = "Overview" }) {
             onClick={() => setProfileOpen((v) => !v)}
             aria-expanded={profileOpen}
           >
-            <span className="navbar-avatar">AN</span>
-            <span className="navbar-profile-name">Analyst</span>
+            <span className="navbar-avatar">
+              {(user?.name || "Analyst").slice(0, 2).toUpperCase()}
+            </span>                                                    {/* ⬅ CHANGED */}
+            <span className="navbar-profile-name">{user?.name || "Analyst"}</span>  {/* ⬅ CHANGED */}
             <ChevronDown size={15} />
           </button>
 
@@ -77,7 +89,7 @@ export default function Navbar({ onToggleMobile, pageTitle = "Overview" }) {
             <div className="navbar-profile-menu" role="menu">
               <button role="menuitem">My Profile</button>
               <button role="menuitem">Preferences</button>
-              <button role="menuitem" className="danger">
+              <button role="menuitem" className="danger" onClick={handleLogout}>  {/* ⬅ CHANGED (added onClick) */}
                 Log out
               </button>
             </div>
