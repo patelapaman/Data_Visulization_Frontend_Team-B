@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import "./Dashboard.css";
+import SecurityEventsTable from "../components/SecurityEventsTable";
 
 /**
  * Dashboard (page)
@@ -92,18 +93,7 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Table : Member 4 plugs in here ---- */}
-      <section className="table-placeholder" aria-label="Security events table">
-        <div className="panel-header">
-          <ListTree size={17} />
-          <h2>Security Events</h2>
-          <span className="placeholder-tag">Member 4</span>
-        </div>
-        <p className="panel-note">
-          Time · Event Type · Severity · Source IP · Status — with search,
-          sorting &amp; pagination, connected to{" "}
-          <code>GET /events</code>.
-        </p>
-      </section>
+      <SecurityEventsTable />
     </DashboardLayout>
   );
 }

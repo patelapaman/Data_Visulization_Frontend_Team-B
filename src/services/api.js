@@ -41,3 +41,49 @@ export async function loginRequest(email, password) {
     role: "Security Analyst",
   };
 }
+
+
+export async function registerRequest(name, email, password) {
+  // Temporary mock
+
+  await new Promise((resolve) => setTimeout(resolve, 600));
+
+  if (!name || !email || !password) {
+    throw new Error("All fields are required.");
+  }
+
+  return {
+    success: true,
+    message: "Account created successfully!"
+  };
+
+  // Later replace with:
+  /*
+  const response = await fetch(`${BASE_URL}/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name, email, password })
+  });
+
+  if (!response.ok) {
+    throw new Error("Registration failed");
+  }
+
+  return response.json();
+  */
+}
+
+
+
+// Fetch Security Events
+export async function getEvents() {
+  const response = await fetch(`${BASE_URL}/events`);
+
+  if (!response.ok) {
+    throw new Error("Unable to fetch events");
+  }
+
+  return response.json();
+}

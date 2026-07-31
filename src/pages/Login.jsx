@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { ShieldHalf, Mail, Lock, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "./Login.css";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
@@ -130,9 +131,29 @@ export default function Login() {
         </form>
 
         <p className="login-footnote">
-          Demo build — any email + a password of 4+ characters signs you in.
-          
-        </p>
+  Demo build — any email + a password of 4+ characters signs you in.
+</p>
+
+<div
+  style={{
+    textAlign: "center",
+    marginTop: "16px",
+    fontSize: "13px",
+    color: "var(--text-secondary)"
+  }}
+>
+  Don't have an account?{" "}
+  <Link
+    to="/register"
+    style={{
+      color: "var(--accent)",
+      textDecoration: "none",
+      fontWeight: 600
+    }}
+  >
+    Create Account
+  </Link>
+</div>
       </div>
     </div>
   );
