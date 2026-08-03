@@ -8,29 +8,48 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { name: "Critical", value: 346 },
-  { name: "High", value: 573 },
-  { name: "Medium", value: 437 },
-  { name: "Low", value: 444 },
+const COLORS = [
+  "#FF4D4F",
+  "#FAAD14",
+  "#1890FF",
+  "#52C41A",
 ];
 
-const COLORS = ["#FF4D4F", "#FAAD14", "#1890FF", "#52C41A"];
+export default function PieChartComponent({ events = [] }) {
 
-function PieChartComponent() {
+  const pieData = [
+    {
+      name: "Critical",
+      value: events.filter(e => e.severity === "Critical").length,
+    },
+    {
+      name: "High",
+      value: events.filter(e => e.severity === "High").length,
+    },
+    {
+      name: "Medium",
+      value: events.filter(e => e.severity === "Medium").length,
+    },
+    {
+      name: "Low",
+      value: events.filter(e => e.severity === "Low").length,
+    },
+  ];
+
   return (
     <div style={{ width: "100%", height: 350 }}>
-      <h2>Pie Chart (Threat Distribution)</h2>
+      <h2>Threat Distribution</h2>
 
-      <ResponsiveContainer>
+      <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            data={pieData}
             dataKey="value"
-            outerRadius={110}
+            nameKey="name"
+            outerRadius={100}
             label
           >
-            {data.map((entry, index) => (
+            {pieData.map((entry, index) => (
               <Cell
                 key={index}
                 fill={COLORS[index % COLORS.length]}
@@ -40,10 +59,9 @@ function PieChartComponent() {
 
           <Tooltip />
           <Legend />
+
         </PieChart>
       </ResponsiveContainer>
     </div>
   );
 }
-
-export default PieChartComponent;

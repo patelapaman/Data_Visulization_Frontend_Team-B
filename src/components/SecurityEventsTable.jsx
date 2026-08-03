@@ -1,30 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import Papa from "papaparse";
+import { useMemo, useState } from "react";
 import "./SecurityEventsTable.css";
 
 const ROWS_PER_PAGE = 10;
 
-export default function SecurityEventsTable() {
-  const [events, setEvents] = useState([]);
+export default function SecurityEventsTable({ events = [] }) {
   const [search, setSearch] = useState("");
   const [sortColumn, setSortColumn] = useState("timestamp");
   const [sortDirection, setSortDirection] = useState("asc");
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    Papa.parse("/security_events.csv", {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        setEvents(results.data);
-      },
-    });
-  }, []);
-
   const filtered = useMemo(() => {
     return events.filter((event) =>
-      Object.values(event).join(" ").toLowerCase().includes(search.toLowerCase())
+      Object.values(event)
+        .join(" ")
+        .toLowerCase()
+        .includes(search.toLowerCase())
     );
   }, [events, search]);
 
@@ -82,7 +72,9 @@ export default function SecurityEventsTable() {
 
           <tr>
 
-            <th onClick={() => sort("timestamp")}>Time</th>
+            <th onClick={() => sort("timestamp")}>
+              Time
+            </th>
 
             <th onClick={() => sort("event_type")}>
               Event Type
@@ -115,11 +107,13 @@ export default function SecurityEventsTable() {
               <td>{event.event_type}</td>
 
               <td>
+
                 <span
                   className={`severity ${event.severity.toLowerCase()}`}
                 >
                   {event.severity}
                 </span>
+
               </td>
 
               <td>{event.source_ip}</td>

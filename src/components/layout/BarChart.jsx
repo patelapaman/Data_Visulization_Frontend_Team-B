@@ -4,35 +4,50 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
+ Tooltip,
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { attack: "File Access", count: 198 },
-  { attack: "SQL Injection Attempt", count: 195 },
-  { attack: "Privilege Escalation", count: 191 },
-  { attack: "Brute Force", count: 189 },
-  { attack: "Login Success", count: 179 },
-];
+export default function BarChartComponent({ events = [] }) {
 
-function BarChartComponent() {
+  const grouped = {};
+
+  events.forEach((event) => {
+
+    const attack = event.event_type;
+
+    grouped[attack] = (grouped[attack] || 0) + 1;
+
+  });
+
+  const barData = Object.keys(grouped).map(type => ({
+    attack: type,
+    count: grouped[type],
+  }));
+
   return (
     <div style={{ width: "100%", height: 350 }}>
-      <h2>Bar Chart (Top Attack Types)</h2>
+      <h2>Top Attack Types</h2>
 
       <ResponsiveContainer>
-        <BarChart data={data}>
+        <BarChart data={barData}>
+
           <CartesianGrid strokeDasharray="3 3" />
+
           <XAxis dataKey="attack" />
+
           <YAxis />
+
           <Tooltip />
-          <Bar dataKey="count" fill="#52C41A" />
+
+          <Bar
+            dataKey="count"
+            fill="#52C41A"
+          />
+
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
-
-export default BarChartComponent;

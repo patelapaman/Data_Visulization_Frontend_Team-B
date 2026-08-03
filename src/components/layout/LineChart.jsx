@@ -9,44 +9,41 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { time: "00:00", events: 85 },
-  { time: "01:00", events: 84 },
-  { time: "02:00", events: 84 },
-  { time: "03:00", events: 84 },
-  { time: "04:00", events: 84 },
-  { time: "05:00", events: 84 },
-  { time: "06:00", events: 72 },
-  { time: "07:00", events: 72 },
-  { time: "08:00", events: 72 },
-  { time: "09:00", events: 72 },
-  { time: "10:00", events: 72 },
-  { time: "11:00", events: 72 },
-  { time: "12:00", events: 72 },
-  { time: "13:00", events: 72 },
-  { time: "14:00", events: 72 },
-  { time: "15:00", events: 72 },
-  { time: "16:00", events: 72 },
-  { time: "17:00", events: 72 },
-  { time: "18:00", events: 72 },
-  { time: "19:00", events: 72 },
-  { time: "20:00", events: 72 },
-  { time: "21:00", events: 72 },
-  { time: "22:00", events: 72 },
-  { time: "23:00", events: 72 },
-];
+export default function LineChartComponent({ events = [] }) {
 
-function LineChartComponent() {
+  const grouped = {};
+
+  events.forEach((event) => {
+
+    if (!event.timestamp) return;
+
+    const hour = event.timestamp.substring(11, 13);
+
+    grouped[hour] = (grouped[hour] || 0) + 1;
+
+  });
+
+  const lineData = Object.keys(grouped)
+    .sort()
+    .map(hour => ({
+      time: `${hour}:00`,
+      events: grouped[hour],
+    }));
+
   return (
     <div style={{ width: "100%", height: 350 }}>
-      <h2>Line Chart (Event Trend)</h2>
+      <h2>Event Trend</h2>
 
       <ResponsiveContainer>
-        <LineChart data={data}>
+        <LineChart data={lineData}>
           <CartesianGrid strokeDasharray="3 3" />
+
           <XAxis dataKey="time" />
+
           <YAxis />
+
           <Tooltip />
+
           <Line
             type="monotone"
             dataKey="events"
@@ -58,5 +55,3 @@ function LineChartComponent() {
     </div>
   );
 }
-
-export default LineChartComponent;

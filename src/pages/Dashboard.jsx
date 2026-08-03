@@ -1,128 +1,287 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import Papa from "papaparse";
+
 import {
   Activity,
   ShieldAlert,
   TriangleAlert,
   Bug,
   Siren,
-  PieChart,
-  LineChart,
-  BarChart3,
-  ListTree,
-  SlidersHorizontal,
 } from "lucide-react";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
-import "./Dashboard.css";
+import PieChartComponent from "../components/layout/PieChart";
+import LineChartComponent from "../components/layout/LineChart";
+import BarChartComponent from "../components/layout/BarChart";
 import SecurityEventsTable from "../components/SecurityEventsTable";
 
-/**
- * Dashboard (page)
- *
- * This is a WORKING DEMO of the dashboard layout so the shell can be
- * previewed/tested on its own. Everything inside the sections marked
- * "PLACEHOLDER" belongs to another teammate's task and should be
- * swapped for their real component — the layout/grid around it can
- * stay as-is since that's this task's job (Member 2).
- *
- *   Member 3 -> <KpiCards />         (replaces .kpi-grid contents)
- *   Member 4 -> <SecurityEventsTable /> (replaces .table-placeholder)
- *   Member 5 -> <ThreatPieChart />, <EventTrendLine />, <TopAttacksBar />
- *   Member 6 -> <FiltersBar />       (replaces .filters-placeholder)
- */
+import "./Dashboard.css";
+
 export default function Dashboard() {
-  return (
+
+  const [events, setEvents] = useState([]);
+
+  const [filters, setFilters] = useState({
+    severity: "",
+    eventType: "",
+    date: "",
+    ip: "",
+  });
+
+  useEffect(() => {
+    Papa.parse("/security_events.csv", {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        setEvents(results.data);
+      },
+    });
+  }, []);
+
+  const filteredEvents = useMemo(() => {
+
+    return events.filter((event) => {
+
+      const severityMatch =
+        !filters.severity ||
+        event.severity === filters.severity;
+
+      const eventMatch =
+        !filters.eventType ||
+        event.event_type === filters.eventType;
+
+      const ipMatch =
+        !filters.ip ||
+        event.source_ip
+          .toLowerCase()
+          .includes(filters.ip.toLowerCase());
+
+      const dateMatch =
+        !filters.date ||
+        event.timestamp.startsWith(filters.date);
+
+      return (
+        severityMatch &&
+        eventMatch &&
+        ipMatch &&
+        dateMatch
+      );
+
+    });
+
+  }, [events, filters]);
+
+  // ---------- KPI DATA ----------
+
+  const totalEvents = filteredEvents.length;
+
+  const criticalThreats = filteredEvents.filter(
+    e => e.severity === "Critical"
+  ).length;
+
+  const highSeverityAlerts = filteredEvents.filter(
+    e => e.severity === "High"
+  ).length;
+
+  const vulnerabilities = filteredEvents.filter(
+    e => e.vulnerability_id &&
+         e.vulnerability_id !== ""
+  ).length;
+
+  const activeIncidents = filteredEvents.filter(
+    e => e.event_status === "Open"
+  ).length;
+
+  // ---------- PIE CHART ----------
+
+  const pieEvents = filteredEvents;
+
+  // ---------- LINE CHART ----------
+
+  const lineEvents = filteredEvents;
+
+  // ---------- BAR CHART ----------
+
+  const barEvents = filteredEvents;
+
+    return (
     <DashboardLayout pageTitle="Overview">
-      {/* ---- Filters row : Member 6 plugs in here ---- */}
-      <section className="filters-placeholder" aria-label="Filters">
-        <SlidersHorizontal size={16} />
-        <span>Filters — Severity · Date range · Event type · IP address</span>
-        <span className="placeholder-tag">Member 6</span>
+
+      {/* ================= Filters ================= */}
+
+      <section className="filters-placeholder">
+
+        <select
+          value={filters.severity}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              severity: e.target.value,
+            })
+          }
+        >
+          <option value="">All Severity</option>
+          <option value="Critical">Critical</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+
+        <select
+          value={filters.eventType}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              eventType: e.target.value,
+            })
+          }
+        >
+          <option value="">All Event Types</option>
+
+          <option value="Malware">
+            Malware
+          </option>
+
+          <option value="Brute Force">
+            Brute Force
+          </option>
+
+          <option value="Phishing">
+            Phishing
+          </option>
+
+          <option value="Reconnaissance">
+            Reconnaissance
+          </option>
+
+        </select>
+
+        <input
+          type="date"
+          value={filters.date}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              date: e.target.value,
+            })
+          }
+        />
+
+        <input
+          type="text"
+          placeholder="Search IP Address"
+          value={filters.ip}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              ip: e.target.value,
+            })
+          }
+        />
+
       </section>
 
-      {/* ---- KPI cards : Member 3 plugs in here, wired to GET /stats ---- */}
-      <section className="kpi-grid" aria-label="Key metrics">
-        <KpiPlaceholder
+      {/* ================= KPI Cards ================= */}
+
+      <section className="kpi-grid">
+
+        <KpiCard
           icon={Activity}
           label="Total Events"
-          value="18,204"
+          value={totalEvents}
           tone="cyan"
         />
-        <KpiPlaceholder
+
+        <KpiCard
           icon={ShieldAlert}
           label="Critical Threats"
-          value="27"
+          value={criticalThreats}
           tone="critical"
         />
-        <KpiPlaceholder
+
+        <KpiCard
           icon={TriangleAlert}
           label="High Severity Alerts"
-          value="93"
+          value={highSeverityAlerts}
           tone="high"
         />
-        <KpiPlaceholder
+
+        <KpiCard
           icon={Bug}
           label="Vulnerabilities"
-          value="341"
+          value={vulnerabilities}
           tone="medium"
         />
-        <KpiPlaceholder
+
+        <KpiCard
           icon={Siren}
           label="Active Incidents"
-          value="6"
+          value={activeIncidents}
           tone="critical"
         />
+
       </section>
 
-      {/* ---- Charts : Member 5 plugs in here ---- */}
+      {/* ================= Charts ================= */}
+
       <section className="charts-grid" aria-label="Analytics">
-        <ChartPlaceholder
-          icon={PieChart}
-          title="Threat Distribution"
-          note="Pie chart · GET /threats"
-        />
-        <ChartPlaceholder
-          icon={LineChart}
-          title="Event Trend"
-          note="Line chart · GET /events"
-        />
-        <ChartPlaceholder
-          icon={BarChart3}
-          title="Top Attack Types"
-          note="Bar chart · GET /threats"
-        />
-      </section>
 
-      {/* ---- Table : Member 4 plugs in here ---- */}
-      <SecurityEventsTable />
+          <PieChartComponent
+            events={filteredEvents}
+          />
+
+          <LineChartComponent
+            events={filteredEvents}
+          />
+
+          <BarChartComponent
+            events={filteredEvents}
+          />
+
+        </section>
+
+      {/* ================= Table ================= */}
+
+      <SecurityEventsTable
+        events={filteredEvents}
+      />
+
     </DashboardLayout>
   );
 }
 
-function KpiPlaceholder({ icon: Icon, label, value, tone }) {
+/* ================= KPI CARD ================= */
+
+function KpiCard({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}) {
+
   return (
+
     <div className={`kpi-card tone-${tone}`}>
+
       <div className="kpi-icon">
-        <Icon size={18} />
+        <Icon size={20} />
       </div>
+
       <div className="kpi-body">
-        <span className="kpi-value">{value}</span>
-        <span className="kpi-label">{label}</span>
+
+        <div className="kpi-value">
+          {value}
+        </div>
+
+        <div className="kpi-label">
+          {label}
+        </div>
+
       </div>
+
     </div>
+
   );
 }
 
-function ChartPlaceholder({ icon: Icon, title, note }) {
-  return (
-    <div className="chart-card">
-      <div className="panel-header">
-        <Icon size={17} />
-        <h2>{title}</h2>
-      </div>
-      <div className="chart-canvas-placeholder">
-        <Icon size={34} strokeWidth={1.3} />
-        <span>{note}</span>
-      </div>
-    </div>
-  );
-}
