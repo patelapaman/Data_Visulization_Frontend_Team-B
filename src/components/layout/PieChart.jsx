@@ -8,38 +8,56 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
+const DEFAULT_DATA = [
   { name: "Critical", value: 346 },
   { name: "High", value: 573 },
   { name: "Medium", value: 437 },
   { name: "Low", value: 444 },
 ];
 
-const COLORS = ["#FF4D4F", "#FAAD14", "#1890FF", "#52C41A"];
+const COLORS = {
+  Critical: "#f0475d",
+  High: "#f5a623",
+  Medium: "#7c6cf5",
+  Low: "#35d399",
+};
 
-function PieChartComponent() {
+const DEFAULT_COLORS = ["#f0475d", "#f5a623", "#7c6cf5", "#35d399"];
+
+function PieChartComponent({ data }) {
+  const chartData = data && data.length > 0 ? data : DEFAULT_DATA;
+
   return (
-    <div style={{ width: "100%", height: 350 }}>
-      <h2>Pie Chart (Threat Distribution)</h2>
-
-      <ResponsiveContainer>
+    <div style={{ width: "100%", height: 220 }}>
+      <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            data={chartData}
             dataKey="value"
-            outerRadius={110}
-            label
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={70}
+            innerRadius={35}
+            paddingAngle={2}
           >
-            {data.map((entry, index) => (
+            {chartData.map((entry, index) => (
               <Cell
-                key={index}
-                fill={COLORS[index % COLORS.length]}
+                key={`cell-${index}`}
+                fill={COLORS[entry.name] || DEFAULT_COLORS[index % DEFAULT_COLORS.length]}
               />
             ))}
           </Pie>
-
-          <Tooltip />
-          <Legend />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#172038",
+              borderColor: "#2c3b5c",
+              color: "#e7ecf5",
+              borderRadius: "8px",
+              fontSize: "12px",
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: "11px", color: "#94a3b8" }} />
         </PieChart>
       </ResponsiveContainer>
     </div>

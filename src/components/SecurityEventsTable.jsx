@@ -4,38 +4,48 @@ import "./SecurityEventsTable.css";
 
 const ROWS_PER_PAGE = 10;
 
-export default function SecurityEventsTable() {
-  const [events, setEvents] = useState([]);
+export default function SecurityEventsTable({ events: externalEvents }) {
+  const [internalEvents, setInternalEvents] = useState([]);
   const [search, setSearch] = useState("");
   const [sortColumn, setSortColumn] = useState("timestamp");
   const [sortDirection, setSortDirection] = useState("asc");
   const [page, setPage] = useState(1);
 
   useEffect(() => {
+    if (externalEvents) return;
     Papa.parse("/security_events.csv", {
       download: true,
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
-        setEvents(results.data);
+        setInternalEvents(results.data || []);
       },
     });
-  }, []);
+  }, [externalEvents]);
+
+  const rawEvents = externalEvents || internalEvents;
+
+  useEffect(() => {
+    setPage(1);
+  }, [rawEvents.length, search]);
 
   const filtered = useMemo(() => {
-    return events.filter((event) =>
+    if (!search.trim()) return rawEvents;
+    return rawEvents.filter((event) =>
       Object.values(event).join(" ").toLowerCase().includes(search.toLowerCase())
     );
-  }, [events, search]);
+  }, [rawEvents, search]);
 
   const sorted = useMemo(() => {
     const data = [...filtered];
 
     data.sort((a, b) => {
-      if (a[sortColumn] < b[sortColumn])
+      const valA = a[sortColumn] || "";
+      const valB = b[sortColumn] || "";
+      if (valA < valB)
         return sortDirection === "asc" ? -1 : 1;
 
-      if (a[sortColumn] > b[sortColumn])
+      if (valA > valB)
         return sortDirection === "asc" ? 1 : -1;
 
       return 0;
@@ -44,7 +54,7 @@ export default function SecurityEventsTable() {
     return data;
   }, [filtered, sortColumn, sortDirection]);
 
-  const totalPages = Math.ceil(sorted.length / ROWS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / ROWS_PER_PAGE));
 
   const currentRows = sorted.slice(
     (page - 1) * ROWS_PER_PAGE,
@@ -64,10 +74,15 @@ export default function SecurityEventsTable() {
     <div className="events-card">
 
       <div className="events-header">
-        <h2>Security Events</h2>
+        <h2>
+          Security Events
+          <span className="events-subcount">
+            ({filtered.length.toLocaleString()} matching)
+          </span>
+        </h2>
 
         <input
-          placeholder="Search events..."
+          placeholder="Search table..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -82,22 +97,24 @@ export default function SecurityEventsTable() {
 
           <tr>
 
-            <th onClick={() => sort("timestamp")}>Time</th>
+            <th onClick={() => sort("timestamp")}>
+              Time {sortColumn === "timestamp" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+            </th>
 
             <th onClick={() => sort("event_type")}>
-              Event Type
+              Event Type {sortColumn === "event_type" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
             </th>
 
             <th onClick={() => sort("severity")}>
-              Severity
+              Severity {sortColumn === "severity" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
             </th>
 
             <th onClick={() => sort("source_ip")}>
-              Source IP
+              Source IP {sortColumn === "source_ip" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
             </th>
 
             <th onClick={() => sort("event_status")}>
-              Status
+              Status {sortColumn === "event_status" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
             </th>
 
           </tr>
@@ -106,29 +123,37 @@ export default function SecurityEventsTable() {
 
         <tbody>
 
-          {currentRows.map((event, index) => (
+          {currentRows.length > 0 ? (
+            currentRows.map((event, index) => (
 
-            <tr key={index}>
+              <tr key={index}>
 
-              <td>{event.timestamp}</td>
+                <td>{event.timestamp}</td>
 
-              <td>{event.event_type}</td>
+                <td>{event.event_type}</td>
 
-              <td>
-                <span
-                  className={`severity ${event.severity.toLowerCase()}`}
-                >
-                  {event.severity}
-                </span>
+                <td>
+                  <span
+                    className={`severity ${event.severity ? event.severity.toLowerCase() : ""}`}
+                  >
+                    {event.severity}
+                  </span>
+                </td>
+
+                <td>{event.source_ip}</td>
+
+                <td>{event.event_status}</td>
+
+              </tr>
+
+            ))
+          ) : (
+            <tr>
+              <td colSpan={5} style={{ textAlign: "center", padding: "28px", color: "var(--text-muted)", fontSize: "13px" }}>
+                No security events match the current filter criteria.
               </td>
-
-              <td>{event.source_ip}</td>
-
-              <td>{event.event_status}</td>
-
             </tr>
-
-          ))}
+          )}
 
         </tbody>
 
@@ -148,7 +173,7 @@ export default function SecurityEventsTable() {
         </span>
 
         <button
-          disabled={page === totalPages}
+          disabled={page >= totalPages}
           onClick={() => setPage(page + 1)}
         >
           Next

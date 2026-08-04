@@ -41,18 +41,107 @@
   color: var(--accent);
 }
 
-/* ---------- Filters row ---------- */
-.filters-placeholder {
+/* ---------- Filters bar ---------- */
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.filters-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: var(--bg-panel);
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  color: var(--text-secondary);
+  gap: 6px;
+  font-family: var(--font-display);
   font-size: 13px;
-  margin-bottom: 20px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-right: 4px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.filter-select,
+.filter-input {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.date-input {
+  width: 130px;
+  color-scheme: dark;
+}
+
+.date-sep {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ip-input {
+  width: 150px;
+}
+
+.filter-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(240, 71, 93, 0.1);
+  border: 1px solid rgba(240, 71, 93, 0.3);
+  color: var(--signal-critical);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-reset-btn:hover {
+  background: rgba(240, 71, 93, 0.2);
+  border-color: var(--signal-critical);
+}
+
+.filter-badge {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  padding: 4px 12px;
+  border-radius: 999px;
 }
 
 /* ---------- KPI grid ---------- */
