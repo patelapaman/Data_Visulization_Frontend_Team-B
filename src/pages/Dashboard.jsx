@@ -18,7 +18,6 @@ import SecurityEventsTable from "../components/SecurityEventsTable";
 import "./Dashboard.css";
 
 export default function Dashboard() {
-
   const [events, setEvents] = useState([]);
 
   const [filters, setFilters] = useState({
@@ -28,6 +27,7 @@ export default function Dashboard() {
     ip: "",
   });
 
+  // Load CSV Data
   useEffect(() => {
     Papa.parse("/security_events.csv", {
       download: true,
@@ -40,85 +40,58 @@ export default function Dashboard() {
   }, []);
 
   const filteredEvents = useMemo(() => {
-
     return events.filter((event) => {
-
       const severityMatch =
-        !filters.severity ||
-        event.severity === filters.severity;
+        !filters.severity || event.severity === filters.severity;
 
       const eventMatch =
-        !filters.eventType ||
-        event.event_type === filters.eventType;
+        !filters.eventType || event.event_type === filters.eventType;
 
       const ipMatch =
         !filters.ip ||
-        event.source_ip
+        (event.source_ip || "")
           .toLowerCase()
           .includes(filters.ip.toLowerCase());
 
       const dateMatch =
         !filters.date ||
-        event.timestamp.startsWith(filters.date);
+        (event.timestamp || "").startsWith(filters.date);
 
-      return (
-        severityMatch &&
-        eventMatch &&
-        ipMatch &&
-        dateMatch
-      );
-
+      return severityMatch && eventMatch && ipMatch && dateMatch;
     });
-
   }, [events, filters]);
 
-  // ---------- KPI DATA ----------
+  // KPI Values
 
   const totalEvents = filteredEvents.length;
 
   const criticalThreats = filteredEvents.filter(
-    e => e.severity === "Critical"
+    (e) => e.severity === "Critical"
   ).length;
 
   const highSeverityAlerts = filteredEvents.filter(
-    e => e.severity === "High"
+    (e) => e.severity === "High"
   ).length;
 
   const vulnerabilities = filteredEvents.filter(
-    e => e.vulnerability_id &&
-         e.vulnerability_id !== ""
+    (e) => e.vulnerability_id && e.vulnerability_id !== ""
   ).length;
 
   const activeIncidents = filteredEvents.filter(
-    e => e.event_status === "Open"
+    (e) => e.event_status === "Open"
   ).length;
 
-  // ---------- PIE CHART ----------
-
-  const pieEvents = filteredEvents;
-
-  // ---------- LINE CHART ----------
-
-  const lineEvents = filteredEvents;
-
-  // ---------- BAR CHART ----------
-
-  const barEvents = filteredEvents;
-
-    return (
+  return (
     <DashboardLayout pageTitle="Overview">
 
-      {/* ================= Filters ================= */}
+      {/* Filters */}
 
       <section className="filters-placeholder">
 
         <select
           value={filters.severity}
           onChange={(e) =>
-            setFilters({
-              ...filters,
-              severity: e.target.value,
-            })
+            setFilters({ ...filters, severity: e.target.value })
           }
         >
           <option value="">All Severity</option>
@@ -131,40 +104,21 @@ export default function Dashboard() {
         <select
           value={filters.eventType}
           onChange={(e) =>
-            setFilters({
-              ...filters,
-              eventType: e.target.value,
-            })
+            setFilters({ ...filters, eventType: e.target.value })
           }
         >
           <option value="">All Event Types</option>
-
-          <option value="Malware">
-            Malware
-          </option>
-
-          <option value="Brute Force">
-            Brute Force
-          </option>
-
-          <option value="Phishing">
-            Phishing
-          </option>
-
-          <option value="Reconnaissance">
-            Reconnaissance
-          </option>
-
+          <option value="Malware">Malware</option>
+          <option value="Brute Force">Brute Force</option>
+          <option value="Phishing">Phishing</option>
+          <option value="Reconnaissance">Reconnaissance</option>
         </select>
 
         <input
           type="date"
           value={filters.date}
           onChange={(e) =>
-            setFilters({
-              ...filters,
-              date: e.target.value,
-            })
+            setFilters({ ...filters, date: e.target.value })
           }
         />
 
@@ -173,16 +127,12 @@ export default function Dashboard() {
           placeholder="Search IP Address"
           value={filters.ip}
           onChange={(e) =>
-            setFilters({
-              ...filters,
-              ip: e.target.value,
-            })
+            setFilters({ ...filters, ip: e.target.value })
           }
         />
-
       </section>
 
-      {/* ================= KPI Cards ================= */}
+      {/* KPI Cards */}
 
       <section className="kpi-grid">
 
@@ -223,35 +173,25 @@ export default function Dashboard() {
 
       </section>
 
-      {/* ================= Charts ================= */}
+      {/* Charts */}
 
-      <section className="charts-grid" aria-label="Analytics">
+      <section className="charts-grid">
 
-          <PieChartComponent
-            events={filteredEvents}
-          />
+        <PieChartComponent events={filteredEvents} />
 
-          <LineChartComponent
-            events={filteredEvents}
-          />
+        <LineChartComponent events={filteredEvents} />
 
-          <BarChartComponent
-            events={filteredEvents}
-          />
+        <BarChartComponent events={filteredEvents} />
 
-        </section>
+      </section>
 
-      {/* ================= Table ================= */}
+      {/* Table */}
 
-      <SecurityEventsTable
-        events={filteredEvents}
-      />
+      <SecurityEventsTable events={filteredEvents} />
 
     </DashboardLayout>
   );
 }
-
-/* ================= KPI CARD ================= */
 
 function KpiCard({
   icon: Icon,
@@ -259,29 +199,16 @@ function KpiCard({
   value,
   tone,
 }) {
-
   return (
-
     <div className={`kpi-card tone-${tone}`}>
-
       <div className="kpi-icon">
         <Icon size={20} />
       </div>
 
       <div className="kpi-body">
-
-        <div className="kpi-value">
-          {value}
-        </div>
-
-        <div className="kpi-label">
-          {label}
-        </div>
-
+        <div className="kpi-value">{value}</div>
+        <div className="kpi-label">{label}</div>
       </div>
-
     </div>
-
   );
 }
-

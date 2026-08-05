@@ -1,89 +1,89 @@
-// ============================================================
-// api.js — shared API service
-// ------------------------------------------------------------
-// This is a starter stub so the Login page and routing have
-// something real to call. Member 7 (API Integration & Services)
-// owns turning this into the full shared client for every
-// endpoint (GET /events, GET /stats, GET /threats, etc.) with
-// proper loading/error handling.
-// ============================================================
+const API_BASE_URL = "http://127.0.0.1:5000/api";
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+// ---------------- AUTH ----------------
 
-/**
- * loginRequest
- * TEMPORARY mock implementation so the login flow is testable
- * before the backend auth endpoint exists. Replace the body with
- * a real fetch/axios call, e.g.:
- *
- *   const res = await fetch(`${BASE_URL}/login`, {
- *     method: "POST",
- *     headers: { "Content-Type": "application/json" },
- *     body: JSON.stringify({ email, password }),
- *   });
- *   if (!res.ok) throw new Error("Invalid credentials");
- *   return res.json(); // { token, name, email, role }
- */
 export async function loginRequest(email, password) {
-  await new Promise((resolve) => setTimeout(resolve, 600)); // simulate latency
-
-  if (!email || !password) {
-    throw new Error("Email and password are required.");
-  }
-  if (password.length < 4) {
-    throw new Error("Invalid email or password.");
-  }
-
   return {
-    token: "demo-token-" + Date.now(),
-    name: email.split("@")[0] || "Analyst",
+    id: 1,
+    name: "Analyst",
     email,
-    role: "Security Analyst",
+    token: "dummy-token",
   };
 }
 
-
-export async function registerRequest(name, email, password) {
-  // Temporary mock
-
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
-  if (!name || !email || !password) {
-    throw new Error("All fields are required.");
-  }
-
+export async function registerRequest(userData) {
   return {
     success: true,
-    message: "Account created successfully!"
+    message: "Registration Successful",
   };
-
-  // Later replace with:
-  /*
-  const response = await fetch(`${BASE_URL}/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ name, email, password })
-  });
-
-  if (!response.ok) {
-    throw new Error("Registration failed");
-  }
-
-  return response.json();
-  */
 }
 
+// ---------------- DASHBOARD ----------------
 
+export async function getStats() {
+  const res = await fetch(`${API_BASE_URL}/dashboard`);
 
-// Fetch Security Events
+  if (!res.ok) throw new Error("Failed to fetch dashboard");
+
+  return await res.json();
+}
+
+// ---------------- EVENTS ----------------
+
 export async function getEvents() {
-  const response = await fetch(`${BASE_URL}/events`);
+  const res = await fetch(`${API_BASE_URL}/events`);
 
-  if (!response.ok) {
-    throw new Error("Unable to fetch events");
-  }
+  if (!res.ok) throw new Error("Failed to fetch events");
 
-  return response.json();
+  return await res.json();
+}
+
+// ---------------- ASSETS ----------------
+
+export async function getAssets() {
+  const res = await fetch(`${API_BASE_URL}/assets`);
+
+  if (!res.ok) throw new Error("Failed to fetch assets");
+
+  return await res.json();
+}
+
+// ---------------- INCIDENTS ----------------
+
+export async function getIncidents() {
+  const res = await fetch(`${API_BASE_URL}/incidents`);
+
+  if (!res.ok) throw new Error("Failed to fetch incidents");
+
+  return await res.json();
+}
+
+// ---------------- VULNERABILITIES ----------------
+
+export async function getVulnerabilities() {
+  const res = await fetch(`${API_BASE_URL}/vulnerabilities`);
+
+  if (!res.ok) throw new Error("Failed to fetch vulnerabilities");
+
+  return await res.json();
+}
+
+// ---------------- ANALYTICS ----------------
+
+export async function getAnalytics() {
+  const res = await fetch(`${API_BASE_URL}/analytics`);
+
+  if (!res.ok) throw new Error("Failed to fetch analytics");
+
+  return await res.json();
+}
+
+// ---------------- THREATS ----------------
+
+export async function getThreats() {
+  const res = await fetch(`${API_BASE_URL}/threats`);
+
+  if (!res.ok) throw new Error("Failed to fetch threats");
+
+  return await res.json();
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { getAnalytics } from "../../services/api";
 import {
   LineChart,
   Line,

@@ -1,4 +1,5 @@
 import React from "react";
+import { getAssets } from "../../services/api";
 import {
   BarChart,
   Bar,
