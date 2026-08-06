@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Papa from "papaparse";
 
 import {
   Activity,
@@ -15,6 +14,8 @@ import LineChartComponent from "../components/layout/LineChart";
 import BarChartComponent from "../components/layout/BarChart";
 import SecurityEventsTable from "../components/SecurityEventsTable";
 
+import { getEvents } from "../services/api";
+
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -27,16 +28,36 @@ export default function Dashboard() {
     ip: "",
   });
 
-  // Load CSV Data
+  // Load API first, CSV as fallback
   useEffect(() => {
-    Papa.parse("/security_events.csv", {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        setEvents(results.data);
-      },
-    });
+    async function loadEvents() {
+      try {
+        const data = await getEvents();
+
+        if (Array.isArray(data) && data.length > 0) {
+          console.log("Loaded events from API");
+          setEvents(data);
+          return;
+        }
+      } catch (err) {
+        console.log("API unavailable. Loading CSV...");
+      }
+
+      Papa.parse("/security_events.csv", {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          console.log("Loaded events from CSV");
+          setEvents(results.data);
+        },
+        error: (err) => {
+          console.error("CSV Error:", err);
+        },
+      });
+    }
+
+    loadEvents();
   }, []);
 
   const filteredEvents = useMemo(() => {
@@ -57,7 +78,12 @@ export default function Dashboard() {
         !filters.date ||
         (event.timestamp || "").startsWith(filters.date);
 
-      return severityMatch && eventMatch && ipMatch && dateMatch;
+      return (
+        severityMatch &&
+        eventMatch &&
+        ipMatch &&
+        dateMatch
+      );
     });
   }, [events, filters]);
 
@@ -74,7 +100,7 @@ export default function Dashboard() {
   ).length;
 
   const vulnerabilities = filteredEvents.filter(
-    (e) => e.vulnerability_id && e.vulnerability_id !== ""
+    (e) => e.vulnerability_id
   ).length;
 
   const activeIncidents = filteredEvents.filter(
@@ -91,7 +117,10 @@ export default function Dashboard() {
         <select
           value={filters.severity}
           onChange={(e) =>
-            setFilters({ ...filters, severity: e.target.value })
+            setFilters({
+              ...filters,
+              severity: e.target.value,
+            })
           }
         >
           <option value="">All Severity</option>
@@ -104,21 +133,29 @@ export default function Dashboard() {
         <select
           value={filters.eventType}
           onChange={(e) =>
-            setFilters({ ...filters, eventType: e.target.value })
+            setFilters({
+              ...filters,
+              eventType: e.target.value,
+            })
           }
         >
           <option value="">All Event Types</option>
           <option value="Malware">Malware</option>
           <option value="Brute Force">Brute Force</option>
           <option value="Phishing">Phishing</option>
-          <option value="Reconnaissance">Reconnaissance</option>
+          <option value="Reconnaissance">
+            Reconnaissance
+          </option>
         </select>
 
         <input
           type="date"
           value={filters.date}
           onChange={(e) =>
-            setFilters({ ...filters, date: e.target.value })
+            setFilters({
+              ...filters,
+              date: e.target.value,
+            })
           }
         />
 
@@ -127,9 +164,13 @@ export default function Dashboard() {
           placeholder="Search IP Address"
           value={filters.ip}
           onChange={(e) =>
-            setFilters({ ...filters, ip: e.target.value })
+            setFilters({
+              ...filters,
+              ip: e.target.value,
+            })
           }
         />
+
       </section>
 
       {/* KPI Cards */}
@@ -185,7 +226,7 @@ export default function Dashboard() {
 
       </section>
 
-      {/* Table */}
+      {/* Security Events Table */}
 
       <SecurityEventsTable events={filteredEvents} />
 
@@ -206,8 +247,13 @@ function KpiCard({
       </div>
 
       <div className="kpi-body">
-        <div className="kpi-value">{value}</div>
-        <div className="kpi-label">{label}</div>
+        <div className="kpi-value">
+          {value}
+        </div>
+
+        <div className="kpi-label">
+          {label}
+        </div>
       </div>
     </div>
   );

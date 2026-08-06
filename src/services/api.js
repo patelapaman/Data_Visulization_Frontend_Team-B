@@ -1,6 +1,6 @@
 const API_BASE_URL = "http://127.0.0.1:5000/api";
 
-// ---------------- AUTH ----------------
+// ---------- AUTH ----------
 
 export async function loginRequest(email, password) {
   return {
@@ -11,79 +11,42 @@ export async function loginRequest(email, password) {
   };
 }
 
-export async function registerRequest(userData) {
+export async function registerRequest() {
   return {
     success: true,
-    message: "Registration Successful",
   };
 }
 
-// ---------------- DASHBOARD ----------------
+// ---------- Helper ----------
 
-export async function getStats() {
-  const res = await fetch(`${API_BASE_URL}/dashboard`);
+async function fetchData(endpoint, fallback = []) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/${endpoint}/`);
 
-  if (!res.ok) throw new Error("Failed to fetch dashboard");
+    if (!res.ok) {
+      return fallback;
+    }
 
-  return await res.json();
+    const json = await res.json();
+
+    // If backend returns { data: [...] }, return only the array
+    if (json.data !== undefined) {
+      return json.data;
+    }
+
+    return json;
+  } catch (err) {
+    console.error(`${endpoint} API unavailable`, err);
+    return fallback;
+  }
 }
 
-// ---------------- EVENTS ----------------
+// ---------- API Calls ----------
 
-export async function getEvents() {
-  const res = await fetch(`${API_BASE_URL}/events`);
-
-  if (!res.ok) throw new Error("Failed to fetch events");
-
-  return await res.json();
-}
-
-// ---------------- ASSETS ----------------
-
-export async function getAssets() {
-  const res = await fetch(`${API_BASE_URL}/assets`);
-
-  if (!res.ok) throw new Error("Failed to fetch assets");
-
-  return await res.json();
-}
-
-// ---------------- INCIDENTS ----------------
-
-export async function getIncidents() {
-  const res = await fetch(`${API_BASE_URL}/incidents`);
-
-  if (!res.ok) throw new Error("Failed to fetch incidents");
-
-  return await res.json();
-}
-
-// ---------------- VULNERABILITIES ----------------
-
-export async function getVulnerabilities() {
-  const res = await fetch(`${API_BASE_URL}/vulnerabilities`);
-
-  if (!res.ok) throw new Error("Failed to fetch vulnerabilities");
-
-  return await res.json();
-}
-
-// ---------------- ANALYTICS ----------------
-
-export async function getAnalytics() {
-  const res = await fetch(`${API_BASE_URL}/analytics`);
-
-  if (!res.ok) throw new Error("Failed to fetch analytics");
-
-  return await res.json();
-}
-
-// ---------------- THREATS ----------------
-
-export async function getThreats() {
-  const res = await fetch(`${API_BASE_URL}/threats`);
-
-  if (!res.ok) throw new Error("Failed to fetch threats");
-
-  return await res.json();
-}
+export const getStats = () => fetchData("dashboard", {});
+export const getEvents = () => fetchData("events", []);
+export const getAssets = () => fetchData("assets", []);
+export const getThreats = () => fetchData("threats", []);
+export const getIncidents = () => fetchData("incidents", []);
+export const getVulnerabilities = () => fetchData("vulnerabilities", []);
+export const getAnalytics = () => fetchData("analytics", {});

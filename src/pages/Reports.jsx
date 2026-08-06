@@ -1,10 +1,10 @@
 import DashboardLayout from "../components/layout/DashboardLayout";
-import BarChartComponent from "../components/layout/BarChart";
 
 export default function Reports() {
   return (
     <DashboardLayout pageTitle="Reports">
-      <BarChartComponent events={[]} />
+      <h2>Reports</h2>
+      <p>Reports module coming soon.</p>
     </DashboardLayout>
   );
 }

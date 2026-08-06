@@ -1,5 +1,4 @@
 import React from "react";
-import { getThreats } from "../../services/api";
 import {
   PieChart,
   Pie,
@@ -17,31 +16,23 @@ const COLORS = [
 ];
 
 export default function PieChartComponent({ events = [] }) {
+ const counts = {};
 
-  const pieData = [
-    {
-      name: "Critical",
-      value: events.filter(e => e.severity === "Critical").length,
-    },
-    {
-      name: "High",
-      value: events.filter(e => e.severity === "High").length,
-    },
-    {
-      name: "Medium",
-      value: events.filter(e => e.severity === "Medium").length,
-    },
-    {
-      name: "Low",
-      value: events.filter(e => e.severity === "Low").length,
-    },
-  ];
+events.forEach((event) => {
+  const severity = event.severity || "Unknown";
+  counts[severity] = (counts[severity] || 0) + 1;
+});
+
+const pieData = Object.keys(counts).map((key) => ({
+  name: key,
+  value: counts[key],
+}));
 
   return (
     <div style={{ width: "100%", height: 350 }}>
       <h2>Threat Distribution</h2>
 
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="90%">
         <PieChart>
           <Pie
             data={pieData}
@@ -60,7 +51,6 @@ export default function PieChartComponent({ events = [] }) {
 
           <Tooltip />
           <Legend />
-
         </PieChart>
       </ResponsiveContainer>
     </div>
