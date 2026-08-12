@@ -1,6 +1,6 @@
 // src/services/api.js
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 /**
  * Reusable fetch handler with Authorization headers and error handling
@@ -81,4 +81,8 @@ export async function getThreats(params = {}) {
   ).toString();
 
   return apiFetch(`/threats${queryString ? `?${queryString}` : ""}`);
+}
+
+export async function getThreatSummary() {
+  return apiFetch("/threat-summary");
 }
