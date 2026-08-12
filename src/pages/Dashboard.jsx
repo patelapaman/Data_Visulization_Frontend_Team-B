@@ -15,13 +15,22 @@ import PieChartComponent from "../components/layout/PieChart";
 import LineChartComponent from "../components/layout/LineChart";
 import BarChartComponent from "../components/layout/BarChart";
 import SecurityEventsTable from "../components/SecurityEventsTable";
-import { getStats, getEvents } from "../services/api";
+import { getStats, getEvents , getThreatSummary } from "../services/api";
 
 import "./Dashboard.css";
 
 export default function Dashboard() {
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
+
+  const [threatSummary, setThreatSummary] = useState({
+  totalEvents: 0,
+  anomaliesDetected: 0,
+  normalEvents: 0,
+  highRiskEvents: 0,
+  criticalThreats: 0,
+  });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -33,31 +42,49 @@ export default function Dashboard() {
   });
 
   const loadDashboardData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [statsData, eventsData] = await Promise.all([
-        getStats(),
-        getEvents(filters),
-      ]);
-      setStats(statsData);
-      setEvents(eventsData.events || eventsData);
-    } catch (err) {
-      setError("Live API connection unavailable. Loaded local dataset.");
-      Papa.parse("/security_events.csv", {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => setEvents(results.data),
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+  setLoading(true);
+  setError(null);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+  try {
+    Papa.parse("/security_events.csv", {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+
+        const data = results.data;  
+        setEvents(results.data);
+
+      setThreatSummary({
+        totalEvents: data.length,
+
+        // anomalies = Critical + High severity events
+        anomaliesDetected: data.filter(
+          (e) => e.severity === "Critical" || e.severity === "High"
+        ).length,
+
+        // normal events = Low severity
+        normalEvents: data.filter((e) => e.severity === "Low").length,
+
+        // High-risk events = High severity
+        highRiskEvents: data.filter((e) => e.severity === "High").length,
+
+        // Critical threats = Critical severity
+        criticalThreats: data.filter((e) => e.severity === "Critical").length,
+      });
+
+        setLoading(false);
+      },
+    });
+  } catch (err) {
+    setError("Failed to load dashboard data.");
+    setLoading(false);
+  }
+}, []);
+
+useEffect(() => {
+  loadDashboardData();
+}, [loadDashboardData]);
 
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
@@ -180,39 +207,39 @@ export default function Dashboard() {
           <Activity className="icon total" />
           <div>
             <span>Total Events</span>
-            <h2>{kpiData.totalEvents}</h2>
+            <h2>{threatSummary.totalEvents}</h2>
           </div>
         </div>
 
         <div className="kpi-card">
           <ShieldAlert className="icon critical" />
           <div>
-            <span>Critical Threats</span>
-            <h2>{kpiData.criticalThreats}</h2>
+            <span>Anomalies Detected</span>
+            <h2>{threatSummary.anomaliesDetected}</h2>
           </div>
         </div>
 
         <div className="kpi-card">
           <TriangleAlert className="icon high" />
           <div>
-            <span>High Severity</span>
-            <h2>{kpiData.highSeverityAlerts}</h2>
+            <span>Normal Events</span>
+            <h2>{threatSummary.normalEvents}</h2>
           </div>
         </div>
 
         <div className="kpi-card">
           <Bug className="icon warning" />
           <div>
-            <span>Vulnerabilities</span>
-            <h2>{kpiData.vulnerabilities}</h2>
+            <span>High-Risk Events</span>
+            <h2>{threatSummary.highRiskEvents}</h2>
           </div>
         </div>
 
         <div className="kpi-card">
           <Siren className="icon critical" />
           <div>
-            <span>Active Incidents</span>
-            <h2>{kpiData.activeIncidents}</h2>
+            <span>Critical Threats</span>
+            <h2>{threatSummary.criticalThreats}</h2>
           </div>
         </div>
       </div>
