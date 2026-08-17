@@ -15,6 +15,7 @@ import PieChartComponent from "../components/layout/PieChart";
 import LineChartComponent from "../components/layout/LineChart";
 import BarChartComponent from "../components/layout/BarChart";
 import SecurityEventsTable from "../components/SecurityEventsTable";
+import EventDetails from "./EventDetails";
 import { getStats, getEvents , getThreatSummary } from "../services/api";
 
 import "./Dashboard.css";
@@ -271,6 +272,8 @@ useEffect(() => {
         <Route index element={<OverviewContent />} />
 
         {/* /dashboard/events */}
+        <Route path="events/:eventId" element={<EventDetails />} />
+
         <Route
           path="events"
           element={

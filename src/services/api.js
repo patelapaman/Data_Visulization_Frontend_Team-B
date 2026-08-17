@@ -86,3 +86,10 @@ export async function getThreats(params = {}) {
 export async function getThreatSummary() {
   return apiFetch("/threat-summary");
 }
+/**
+ * EVENT INVESTIGATION SERVICE
+ * GET /predictions/{event_id}
+ */
+export async function getPrediction(eventId) {
+  return apiFetch(`/predictions/${eventId}`);
+}

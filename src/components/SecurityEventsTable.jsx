@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import "./SecurityEventsTable.css";
 
 const ROWS_PER_PAGE = 10;
@@ -100,9 +101,18 @@ export default function SecurityEventsTable({ events = [] }) {
 
           {currentRows.map((event, index) => (
 
-            <tr key={index}>
+            <tr key={event.event_id ?? event.id ?? index}>
 
-              <td>{event.timestamp}</td>
+              <td>
+                {event.event_id || event.id ? (
+                  <Link to={`/dashboard/events/${encodeURIComponent(event.event_id ?? event.id)}`}>
+                    {event.event_id ?? event.id}
+                  </Link>
+                ) : (
+                  event.timestamp
+                )}
+                <div>{event.timestamp}</div>
+              </td>
 
               <td>{event.event_type}</td>
 
