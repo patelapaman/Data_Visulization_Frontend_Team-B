@@ -1,13 +1,20 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "./SecurityEventsTable.css";
-
 const ROWS_PER_PAGE = 10;
 
-export default function SecurityEventsTable({ events = [] }) {
+export default function SecurityEventsTable({ events = [], searchQuery = "" }) {
   const [search, setSearch] = useState("");
   const [sortColumn, setSortColumn] = useState("timestamp");
-  const [sortDirection, setSortDirection] = useState("asc");
+  const [sortDirection, setSortDirection] = useState("desc");
   const [page, setPage] = useState(1);
+
+  // Sync navbar search with local search
+  useEffect(() => {
+    setSearch(searchQuery);
+    setPage(1);
+  }, [searchQuery]);
+
+  // ---------------- Filter ----------------
 
   const filtered = useMemo(() => {
     return events.filter((event) =>
@@ -18,14 +25,19 @@ export default function SecurityEventsTable({ events = [] }) {
     );
   }, [events, search]);
 
+  // ---------------- Sort ----------------
+
   const sorted = useMemo(() => {
     const data = [...filtered];
 
     data.sort((a, b) => {
-      if (a[sortColumn] < b[sortColumn])
+      const valueA = (a[sortColumn] || "").toString().toLowerCase();
+      const valueB = (b[sortColumn] || "").toString().toLowerCase();
+
+      if (valueA < valueB)
         return sortDirection === "asc" ? -1 : 1;
 
-      if (a[sortColumn] > b[sortColumn])
+      if (valueA > valueB)
         return sortDirection === "asc" ? 1 : -1;
 
       return 0;
@@ -34,18 +46,25 @@ export default function SecurityEventsTable({ events = [] }) {
     return data;
   }, [filtered, sortColumn, sortDirection]);
 
-  const totalPages = Math.ceil(sorted.length / ROWS_PER_PAGE);
+  // ---------------- Pagination ----------------
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(sorted.length / ROWS_PER_PAGE)
+  );
 
   const currentRows = sorted.slice(
     (page - 1) * ROWS_PER_PAGE,
     page * ROWS_PER_PAGE
   );
 
-  function sort(col) {
-    if (sortColumn === col) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  function sort(column) {
+    if (sortColumn === column) {
+      setSortDirection((prev) =>
+        prev === "asc" ? "desc" : "asc"
+      );
     } else {
-      setSortColumn(col);
+      setSortColumn(column);
       setSortDirection("asc");
     }
   }
@@ -54,16 +73,19 @@ export default function SecurityEventsTable({ events = [] }) {
     <div className="events-card">
 
       <div className="events-header">
+
         <h2>Security Events</h2>
 
         <input
-          placeholder="Search events..."
+          type="text"
+          placeholder="Search events, IP, severity..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
             setPage(1);
           }}
         />
+
       </div>
 
       <table className="events-table">
@@ -98,31 +120,55 @@ export default function SecurityEventsTable({ events = [] }) {
 
         <tbody>
 
-          {currentRows.map((event, index) => (
+          {currentRows.length > 0 ? (
 
-            <tr key={index}>
+            currentRows.map((event, index) => (
 
-              <td>{event.timestamp}</td>
+              <tr key={event._id || index}>
 
-              <td>{event.event_type}</td>
+                <td>{event.timestamp}</td>
 
-              <td>
+                <td>
+                  {event.event_type ||
+                    event.type ||
+                    event.attack_type}
+                </td>
 
-                <span
-                  className={`severity ${event.severity.toLowerCase()}`}
-                >
-                  {event.severity}
-                </span>
+                <td>
 
+                  <span
+                    className={`severity ${(event.severity || "").toLowerCase()}`}
+                  >
+                    {event.severity}
+                  </span>
+
+                </td>
+
+                <td>{event.source_ip}</td>
+
+                <td>{event.event_status}</td>
+
+              </tr>
+
+            ))
+
+          ) : (
+
+            <tr>
+
+              <td
+                colSpan="5"
+                style={{
+                  textAlign: "center",
+                  padding: "25px",
+                }}
+              >
+                No matching events found.
               </td>
-
-              <td>{event.source_ip}</td>
-
-              <td>{event.event_status}</td>
 
             </tr>
 
-          ))}
+          )}
 
         </tbody>
 

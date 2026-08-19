@@ -50,20 +50,28 @@ export default function Login() {
         <div className="login-glow login-glow-violet" />
       </div>
 
+      <div className="login-telemetry" aria-hidden="true">
+        <span className="telemetry-chip chip-a">SYSTEM ONLINE</span>
+        <span className="telemetry-chip chip-b">AI ENGINE READY</span>
+        <span className="telemetry-chip chip-c">THREAT MONITORING</span>
+        <span className="telemetry-line line-a" />
+        <span className="telemetry-line line-b" />
+      </div>
+
       <div className="login-card">
         <div className="login-brand">
           <div className="login-brand-mark">
             <ShieldHalf size={26} strokeWidth={2.25} />
           </div>
           <div>
-            <h1>SENTRYNET</h1>
-            <p>AI-Assisted Threat Detection Dashboard</p>
+            <h1>INFOSYS SPRINGBOARD 7.0</h1>
+            <p>AI-powered Security Operations Center</p>
           </div>
         </div>
 
         <div className="login-heading">
-          <h2>Analyst sign in</h2>
-          <p>Enter your credentials to access the monitoring console.</p>
+          <h2>Secure analyst access</h2>
+          <p>Authenticate to access the security operations workspace.</p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit} noValidate>

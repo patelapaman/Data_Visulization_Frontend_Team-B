@@ -10,22 +10,19 @@ import {
 } from "recharts";
 
 export default function LineChartComponent({ events = [] }) {
-
   const grouped = {};
 
   events.forEach((event) => {
-
     if (!event.timestamp) return;
 
     const hour = event.timestamp.substring(11, 13);
 
     grouped[hour] = (grouped[hour] || 0) + 1;
-
   });
 
   const lineData = Object.keys(grouped)
     .sort()
-    .map(hour => ({
+    .map((hour) => ({
       time: `${hour}:00`,
       events: grouped[hour],
     }));
@@ -34,7 +31,7 @@ export default function LineChartComponent({ events = [] }) {
     <div style={{ width: "100%", height: 350 }}>
       <h2>Event Trend</h2>
 
-      <ResponsiveContainer>
+      <ResponsiveContainer width="100%" height="90%">
         <LineChart data={lineData}>
           <CartesianGrid strokeDasharray="3 3" />
 

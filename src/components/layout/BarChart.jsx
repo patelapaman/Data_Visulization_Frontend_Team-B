@@ -4,24 +4,20 @@ import {
   Bar,
   XAxis,
   YAxis,
- Tooltip,
+  Tooltip,
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
 
 export default function BarChartComponent({ events = [] }) {
-
   const grouped = {};
 
   events.forEach((event) => {
-
-    const attack = event.event_type;
-
+    const attack = event.event_type || "Unknown";
     grouped[attack] = (grouped[attack] || 0) + 1;
-
   });
 
-  const barData = Object.keys(grouped).map(type => ({
+  const barData = Object.keys(grouped).map((type) => ({
     attack: type,
     count: grouped[type],
   }));
@@ -30,9 +26,8 @@ export default function BarChartComponent({ events = [] }) {
     <div style={{ width: "100%", height: 350 }}>
       <h2>Top Attack Types</h2>
 
-      <ResponsiveContainer>
+      <ResponsiveContainer width="100%" height="90%">
         <BarChart data={barData}>
-
           <CartesianGrid strokeDasharray="3 3" />
 
           <XAxis dataKey="attack" />
@@ -45,7 +40,6 @@ export default function BarChartComponent({ events = [] }) {
             dataKey="count"
             fill="#52C41A"
           />
-
         </BarChart>
       </ResponsiveContainer>
     </div>

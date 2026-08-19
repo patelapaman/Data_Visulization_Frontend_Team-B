@@ -2,47 +2,72 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { loginRequest } from "../services/api";
 
 const AuthContext = createContext(null);
-const STORAGE_KEY = "sentrynet_token";
 
-/**
- * AuthProvider
- * Minimal auth state shared across the app: current user + token,
- * persisted in localStorage so a refresh doesn't kick the user back
- * to /login. `login()` currently calls a mocked request in
- * services/api.js — Member 7 should point that at the real
- * authentication endpoint once it exists.
- */
+const STORAGE_KEY = "infosys_springboard_token";
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Load user from localStorage when app starts
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    const savedUser = localStorage.getItem(STORAGE_KEY);
+
+    if (savedUser) {
       try {
-        setUser(JSON.parse(saved));
-      } catch {
+        setUser(JSON.parse(savedUser));
+      } catch (err) {
+        console.log(err);
         localStorage.removeItem(STORAGE_KEY);
       }
     }
+
     setLoading(false);
   }, []);
 
-  async function login(email, password) {
-    const result = await loginRequest(email, password);
-    setUser(result);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
-    return result;
-  }
+  // Login
+  const login = async (email, password) => {
+    const loggedInUser = await loginRequest(email, password);
 
-  function logout() {
+    setUser(loggedInUser);
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(loggedInUser)
+    );
+
+    return loggedInUser;
+  };
+
+  // Logout
+  const logout = () => {
     setUser(null);
+
     localStorage.removeItem(STORAGE_KEY);
-  }
+
+    sessionStorage.clear();
+  };
+
+  // Update profile after editing
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(updatedUser)
+    );
+  };
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, loading, login, logout }}
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        updateUser,
+        isAuthenticated: !!user,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -50,7 +75,7 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used inside AuthProvider");
+  return context;
 }

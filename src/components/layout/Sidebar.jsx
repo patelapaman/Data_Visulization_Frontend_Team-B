@@ -9,6 +9,7 @@ import {
   Bug,
   Siren,
   FileBarChart,
+  BrainCircuit,
   Settings,
   LogOut,
   ChevronsLeft,
@@ -25,7 +26,7 @@ const NAV_ITEMS = [
     icon: ListTree,
   },
   {
-    label: "Threat Intelligence",
+    label: "Threat Distribution",
     path: "/dashboard/threats",
     icon: Radar,
   },
@@ -43,6 +44,11 @@ const NAV_ITEMS = [
     label: "Reports",
     path: "/dashboard/reports",
     icon: FileBarChart,
+  },
+  {
+    label: "AI Detection",
+    path: "/dashboard/ai-detection",
+    icon: BrainCircuit,
   },
 ];
 
@@ -96,10 +102,10 @@ export default function Sidebar({
           {!collapsed && (
             <div className="sidebar-brand-text">
               <span className="sidebar-brand-title">
-                SENTRYNET
+                INFOSYS SPRINGBOARD 7.0
               </span>
               <span className="sidebar-brand-subtitle">
-                Threat Ops
+                Cybersecurity Operations
               </span>
             </div>
           )}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, cloneElement } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import "./DashboardLayout.css";
@@ -24,6 +24,7 @@ import "./DashboardLayout.css";
 export default function DashboardLayout({ pageTitle, children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="dashboard-shell">
@@ -40,9 +41,11 @@ export default function DashboardLayout({ pageTitle, children }) {
         <Navbar
           pageTitle={pageTitle}
           onToggleMobile={() => setMobileOpen(true)}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
 
-        <main className="dashboard-content">{children}</main>
+        <main className="dashboard-content">{React.isValidElement(children) ? cloneElement(children, { searchQuery }) : children}</main>
       </div>
     </div>
   );

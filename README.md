@@ -1,4 +1,4 @@
-# SentryNet — AI-Assisted Threat Detection Dashboard (Frontend)
+# INFOSYS SPRINGBOARD 7.0 — AI-Assisted Threat Detection Dashboard (Frontend)
 
 
 ## Folder structure
