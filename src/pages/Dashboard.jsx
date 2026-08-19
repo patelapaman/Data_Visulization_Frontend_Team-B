@@ -8,6 +8,7 @@ import PieChartComponent from "../components/layout/PieChart";
 import LineChartComponent from "../components/layout/LineChart";
 import BarChartComponent from "../components/layout/BarChart";
 import SecurityEventsTable from "../components/SecurityEventsTable";
+<<<<<<< HEAD
 import { getEvents } from "../services/api";
 import "./Dashboard.css";
 
@@ -16,6 +17,26 @@ const MONTHS = [
   ["05", "May"], ["06", "June"], ["07", "July"], ["08", "August"],
   ["09", "September"], ["10", "October"], ["11", "November"], ["12", "December"],
 ];
+=======
+import { getStats, getEvents , getThreatSummary } from "../services/api";
+
+import "./Dashboard.css";
+
+export default function Dashboard() {
+  const [events, setEvents] = useState([]);
+  const [stats, setStats] = useState(null);
+
+  const [threatSummary, setThreatSummary] = useState({
+  totalEvents: 0,
+  anomaliesDetected: 0,
+  normalEvents: 0,
+  highRiskEvents: 0,
+  criticalThreats: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+>>>>>>> 782dd70ab0d199645c146adda816cab205fcfece
 
 const SEVERITIES = ["Critical", "High", "Medium", "Low"];
 
@@ -42,6 +63,7 @@ export default function Dashboard({ searchQuery = "" }) {
     ip: "",
   });
 
+<<<<<<< HEAD
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -69,6 +91,52 @@ export default function Dashboard({ searchQuery = "" }) {
   const severityCounts = useMemo(() => Object.fromEntries(
     SEVERITIES.map((severity) => [severity, events.filter((e) => e.severity === severity).length])
   ), [events]);
+=======
+  const loadDashboardData = useCallback(async () => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    Papa.parse("/security_events.csv", {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+
+        const data = results.data;  
+        setEvents(results.data);
+
+      setThreatSummary({
+        totalEvents: data.length,
+
+        // anomalies = Critical + High severity events
+        anomaliesDetected: data.filter(
+          (e) => e.severity === "Critical" || e.severity === "High"
+        ).length,
+
+        // normal events = Low severity
+        normalEvents: data.filter((e) => e.severity === "Low").length,
+
+        // High-risk events = High severity
+        highRiskEvents: data.filter((e) => e.severity === "High").length,
+
+        // Critical threats = Critical severity
+        criticalThreats: data.filter((e) => e.severity === "Critical").length,
+      });
+
+        setLoading(false);
+      },
+    });
+  } catch (err) {
+    setError("Failed to load dashboard data.");
+    setLoading(false);
+  }
+}, []);
+
+useEffect(() => {
+  loadDashboardData();
+}, [loadDashboardData]);
+>>>>>>> 782dd70ab0d199645c146adda816cab205fcfece
 
   const filteredEvents = useMemo(() => {
     const query = clean(searchQuery).toLowerCase();
@@ -114,11 +182,139 @@ export default function Dashboard({ searchQuery = "" }) {
         ? filters.year || "Choose year"
         : "All dates";
 
+<<<<<<< HEAD
   const totalEvents = filteredEvents.length;
   const criticalThreats = filteredEvents.filter((e) => e.severity === "Critical").length;
   const highSeverityAlerts = filteredEvents.filter((e) => e.severity === "High").length;
   const vulnerabilities = filteredEvents.filter((e) => clean(e.vulnerability_id)).length;
   const activeIncidents = filteredEvents.filter((e) => ["Open", "Investigating", "Active"].includes(clean(e.event_status))).length;
+=======
+      {/* Filters Section */}
+      <div className="filters-card">
+        <div className="filter-group">
+          <label>Severity</label>
+          <select
+            value={filters.severity}
+            onChange={(e) =>
+              setFilters({ ...filters, severity: e.target.value })
+            }
+          >
+            <option value="">All Severities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Event Type</label>
+          <select
+            value={filters.eventType}
+            onChange={(e) =>
+              setFilters({ ...filters, eventType: e.target.value })
+            }
+          >
+            <option value="">All Event Types</option>
+            <option value="DDoS Attack">DDoS Attack</option>
+            <option value="SQL Injection">SQL Injection</option>
+            <option value="Unauthorized Login">Unauthorized Login</option>
+            <option value="Malware Execution">Malware Execution</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label>Date</label>
+          <input
+            type="date"
+            value={filters.date}
+            onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+          />
+        </div>
+
+        <div className="filter-group">
+          <label>Source IP</label>
+          <input
+            type="text"
+            placeholder="Filter by IP..."
+            value={filters.ip}
+            onChange={(e) => setFilters({ ...filters, ip: e.target.value })}
+          />
+        </div>
+
+        <button
+          className="reset-btn"
+          onClick={() =>
+            setFilters({ severity: "", eventType: "", date: "", ip: "" })
+          }
+        >
+          Reset Filters
+        </button>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="kpi-grid">
+        <div className="kpi-card">
+          <Activity className="icon total" />
+          <div>
+            <span>Total Events</span>
+            <h2>{threatSummary.totalEvents}</h2>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <ShieldAlert className="icon critical" />
+          <div>
+            <span>Anomalies Detected</span>
+            <h2>{threatSummary.anomaliesDetected}</h2>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <TriangleAlert className="icon high" />
+          <div>
+            <span>Normal Events</span>
+            <h2>{threatSummary.normalEvents}</h2>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <Bug className="icon warning" />
+          <div>
+            <span>High-Risk Events</span>
+            <h2>{threatSummary.highRiskEvents}</h2>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <Siren className="icon critical" />
+          <div>
+            <span>Critical Threats</span>
+            <h2>{threatSummary.criticalThreats}</h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="charts-grid">
+        <div className="chart-card">
+          <PieChartComponent events={filteredEvents} />
+        </div>
+        <div className="chart-card">
+          <LineChartComponent events={filteredEvents} />
+        </div>
+        <div className="chart-card">
+          <BarChartComponent events={filteredEvents} />
+        </div>
+      </div>
+
+      {/* Events Table */}
+      <div className="table-card">
+        <SecurityEventsTable events={filteredEvents} />
+      </div>
+    </>
+  );
+>>>>>>> 782dd70ab0d199645c146adda816cab205fcfece
 
   return (
     <DashboardLayout pageTitle="Overview">
@@ -263,6 +459,7 @@ export default function Dashboard({ searchQuery = "" }) {
     </DashboardLayout>
   );
 }
+<<<<<<< HEAD
 
 function KpiCard({ icon: Icon, label, value, tone }) {
   return (
@@ -272,3 +469,5 @@ function KpiCard({ icon: Icon, label, value, tone }) {
     </div>
   );
 }
+=======
+>>>>>>> 782dd70ab0d199645c146adda816cab205fcfece
