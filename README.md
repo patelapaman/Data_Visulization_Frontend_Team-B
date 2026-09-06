@@ -29,10 +29,19 @@ You'll need: **MongoDB**, **Python 3.10+**, and **Node.js 18+**.
 ### 1. Database
 Get MongoDB running first — everything else depends on it.
 ```bash
+<<<<<<< HEAD
+# Option A: Docker (simplest)
+docker run -d -p 27017:27017 --name threat-mongo mongo:7
+
+# Option B: install MongoDB Community Server locally and run `mongod`
+
+# Option C: use a MongoDB Atlas cluster and put its connection string
+=======
 
 # Option A: install MongoDB Community Server locally and run `mongod`
 
 # Option B: use a MongoDB Atlas cluster and put its connection string
+>>>>>>> origin/main
 #           in backend/.env as MONGO_URI
 ```
 

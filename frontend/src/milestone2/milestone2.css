@@ -284,6 +284,28 @@
   font-family: var(--font-body);
   font-size: 13px;
 }
+<<<<<<< HEAD
+.m2-filters select {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel-alt);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  min-width: 135px;
+}
+.m2-filters .m2-date-filter {
+  gap: 5px;
+  padding: 6px 9px;
+}
+.m2-date-filter span {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.m2-date-filter input {
+  min-width: 125px;
+}
+=======
+>>>>>>> origin/main
 .m2-filters select option {
   background: var(--bg-panel);
   color: var(--text-primary);

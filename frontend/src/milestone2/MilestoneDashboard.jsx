@@ -11,15 +11,83 @@ import "./milestone2.css";
 export default function Dashboard() {
   const { predictions: pred, summary, performance, health, loading, error, refresh } = useMilestone2();
   const [search, setSearch] = useState("");
+<<<<<<< HEAD
+  const [filters, setFilters] = useState({
+    risk: "",
+    threatType: "",
+    asset: "",
+    department: "",
+    mitre: "",
+    dateFrom: "",
+    dateTo: "",
+    status: "",
+    sort: "newest",
+  });
+=======
   const [severity, setSeverity] = useState("");
+>>>>>>> origin/main
   const nav = useNavigate();
 
   useEffect(() => { refresh(); }, [refresh]);
 
+<<<<<<< HEAD
+  const getEventValue = (prediction, ...keys) => {
+    const event = prediction?.event || {};
+    for (const key of keys) {
+      if (event[key] !== undefined && event[key] !== null && String(event[key]).trim()) return String(event[key]);
+    }
+    return "Unknown";
+  };
+
+  const filterOptions = useMemo(() => {
+    const values = (selector) => [...new Set(pred.map(selector))].sort((a, b) => a.localeCompare(b));
+    return {
+      threatTypes: values((x) => x?.threat_type || "Unknown"),
+      assets: values((x) => getEventValue(x, "asset", "asset_name")),
+      departments: values((x) => getEventValue(x, "department")),
+      mitre: values((x) => getEventValue(x, "mitre_id", "mitre_technique", "mitre_attack")),
+      statuses: values((x) => getEventValue(x, "status", "event_status")),
+    };
+  }, [pred]);
+
+  const filtered = useMemo(() => {
+    const searchValue = search.toLowerCase();
+    const result = pred.filter((x) => {
+      const event = x?.event || {};
+      const timestamp = new Date(x?.prediction_timestamp || event.timestamp);
+      const eventDate = Number.isNaN(timestamp.getTime()) ? "" : timestamp.toISOString().slice(0, 10);
+      return (
+        (!filters.risk || x?.severity === filters.risk) &&
+        (!filters.threatType || x?.threat_type === filters.threatType) &&
+        (!filters.asset || getEventValue(x, "asset", "asset_name") === filters.asset) &&
+        (!filters.department || getEventValue(x, "department") === filters.department) &&
+        (!filters.mitre || getEventValue(x, "mitre_id", "mitre_technique", "mitre_attack") === filters.mitre) &&
+        (!filters.status || getEventValue(x, "status", "event_status") === filters.status) &&
+        (!filters.dateFrom || (eventDate && eventDate >= filters.dateFrom)) &&
+        (!filters.dateTo || (eventDate && eventDate <= filters.dateTo)) &&
+        (!searchValue || JSON.stringify(x ?? {}).toLowerCase().includes(searchValue))
+      );
+    });
+
+    return result.sort((a, b) => {
+      if (filters.sort === "confidence-high" || filters.sort === "confidence-low") {
+        const difference = Number(a?.confidence_score || 0) - Number(b?.confidence_score || 0);
+        return filters.sort === "confidence-high" ? -difference : difference;
+      }
+      const difference = new Date(a?.prediction_timestamp || a?.event?.timestamp) - new Date(b?.prediction_timestamp || b?.event?.timestamp);
+      return filters.sort === "oldest" ? difference : -difference;
+    });
+  }, [pred, search, filters]);
+
+  function updateFilter(name, value) {
+    setFilters((current) => ({ ...current, [name]: value }));
+  }
+=======
   const filtered = useMemo(() => pred.filter((x) =>
     (!severity || x?.severity === severity) &&
     (!search || JSON.stringify(x ?? {}).toLowerCase().includes(search.toLowerCase()))
   ), [pred, search, severity]);
+>>>>>>> origin/main
 
   const kpis = summary?.kpis || {};
   const distribution = [
@@ -196,8 +264,14 @@ export default function Dashboard() {
               onSelect={(id) => nav(`/dashboard/ai-detection/events/${encodeURIComponent(id)}`)}
               search={search}
               setSearch={setSearch}
+<<<<<<< HEAD
+              filters={filters}
+              filterOptions={filterOptions}
+              updateFilter={updateFilter}
+=======
               severity={severity}
               setSeverity={setSeverity}
+>>>>>>> origin/main
             />
           </>
         )}
