@@ -11,6 +11,7 @@ import "./milestone2.css";
 export default function Dashboard() {
   const { predictions: pred, summary, performance, health, loading, error, refresh } = useMilestone2();
   const [search, setSearch] = useState("");
+<<<<<<< HEAD
   const [filters, setFilters] = useState({
     risk: "",
     threatType: "",
@@ -22,10 +23,14 @@ export default function Dashboard() {
     status: "",
     sort: "newest",
   });
+=======
+  const [severity, setSeverity] = useState("");
+>>>>>>> origin/main
   const nav = useNavigate();
 
   useEffect(() => { refresh(); }, [refresh]);
 
+<<<<<<< HEAD
   const getEventValue = (prediction, ...keys) => {
     const event = prediction?.event || {};
     for (const key of keys) {
@@ -77,6 +82,12 @@ export default function Dashboard() {
   function updateFilter(name, value) {
     setFilters((current) => ({ ...current, [name]: value }));
   }
+=======
+  const filtered = useMemo(() => pred.filter((x) =>
+    (!severity || x?.severity === severity) &&
+    (!search || JSON.stringify(x ?? {}).toLowerCase().includes(search.toLowerCase()))
+  ), [pred, search, severity]);
+>>>>>>> origin/main
 
   const kpis = summary?.kpis || {};
   const distribution = [
@@ -253,9 +264,14 @@ export default function Dashboard() {
               onSelect={(id) => nav(`/dashboard/ai-detection/events/${encodeURIComponent(id)}`)}
               search={search}
               setSearch={setSearch}
+<<<<<<< HEAD
               filters={filters}
               filterOptions={filterOptions}
               updateFilter={updateFilter}
+=======
+              severity={severity}
+              setSeverity={setSeverity}
+>>>>>>> origin/main
             />
           </>
         )}

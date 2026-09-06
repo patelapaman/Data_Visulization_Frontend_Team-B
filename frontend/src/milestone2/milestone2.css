@@ -284,6 +284,7 @@
   font-family: var(--font-body);
   font-size: 13px;
 }
+<<<<<<< HEAD
 .m2-filters select {
   border: 1px solid var(--border-subtle);
   background: var(--bg-panel-alt);
@@ -303,6 +304,8 @@
 .m2-date-filter input {
   min-width: 125px;
 }
+=======
+>>>>>>> origin/main
 .m2-filters select option {
   background: var(--bg-panel);
   color: var(--text-primary);

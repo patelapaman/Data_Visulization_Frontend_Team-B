@@ -3,10 +3,17 @@ import { ChevronRight, Search } from "lucide-react";
 
 const PAGE_SIZE = 12;
 
+<<<<<<< HEAD
 export default function ThreatTable({ data, onSelect, search, setSearch, filters, filterOptions, updateFilter }) {
   const [page, setPage] = useState(1);
 
   useEffect(() => setPage(1), [search, filters]);
+=======
+export default function ThreatTable({ data, onSelect, search, setSearch, severity, setSeverity }) {
+  const [page, setPage] = useState(1);
+
+  useEffect(() => setPage(1), [search, severity]);
+>>>>>>> origin/main
 
   const totalPages = Math.max(1, Math.ceil(data.length / PAGE_SIZE));
   const rows = useMemo(
@@ -23,6 +30,7 @@ export default function ThreatTable({ data, onSelect, search, setSearch, filters
         </div>
         <div className="m2-filters">
           <label><Search size={16} /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search event, IP, type, user..." /></label>
+<<<<<<< HEAD
           <select value={filters.risk} onChange={e => updateFilter("risk", e.target.value)} aria-label="Risk level">
             <option value="">All risk levels</option>
             <option>Normal</option><option>Low Threat</option><option>Medium Threat</option>
@@ -56,6 +64,13 @@ export default function ThreatTable({ data, onSelect, search, setSearch, filters
             <option value="confidence-high">Highest confidence</option>
             <option value="confidence-low">Lowest confidence</option>
           </select>
+=======
+          <select value={severity} onChange={e => setSeverity(e.target.value)}>
+            <option value="">All severity</option>
+            <option>Normal</option><option>Low Threat</option><option>Medium Threat</option>
+            <option>High Threat</option><option>Critical Threat</option>
+          </select>
+>>>>>>> origin/main
         </div>
       </div>
       <div className="m2-table-wrap">
